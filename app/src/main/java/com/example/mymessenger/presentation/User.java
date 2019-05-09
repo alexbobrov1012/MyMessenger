@@ -1,4 +1,4 @@
-package com.example.mymessenger;
+package com.example.mymessenger.presentation;
 
 import android.net.Uri;
 

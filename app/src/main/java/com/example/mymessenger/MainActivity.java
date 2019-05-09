@@ -1,5 +1,6 @@
 package com.example.mymessenger;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,12 +10,19 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Fade;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.mymessenger.presentation.User;
+import com.example.mymessenger.presentation.chat.ChatsFragment;
+import com.example.mymessenger.presentation.profile.ProfileFragment;
+import com.example.mymessenger.presentation.user.UsersFragment;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -33,9 +41,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int RC_SIGN_IN = 3228;
-
-    List<AuthUI.IdpConfig> providers;
+    private static final String TAG = "USER_AUTH";
 
     Button button;
 
@@ -45,31 +51,23 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_main);
-        providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.PhoneBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        getWindow().setExitTransition(new Fade());
+        getWindow().setEnterTransition(new Fade());
 
-        FirebaseAuth userAuth = FirebaseAuth.getInstance();
-        Snackbar.make(findViewById(R.id.viewPager),"" + userAuth.getCurrentUser().getUid(), Snackbar.LENGTH_LONG).show();
-        //addNewUserToDB(new User(userAuth.getUid(), userAuth.getCurrentUser().getDisplayName(), userAuth.getCurrentUser().getPhotoUrl()));
-        if (userAuth.getCurrentUser() != null) {
-            FirebaseUserMetadata metadata = userAuth.getCurrentUser().getMetadata();
-            if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
-                //Snackbar.make(findViewById(R.id.button),"Greetings new user!!!", Snackbar.LENGTH_LONG).show();
-                Log.d("USER_", "suc");
-                //addNewUserToDB(new User(userAuth.getUid(), userAuth.getCurrentUser().getDisplayName(), userAuth.getCurrentUser().getPhotoUrl()));
-            } else {
-                //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
-            }
+        if (viewModel.getCurrentUser() != null) {
+           // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
+            Log.d(TAG, "suc"+ viewModel.getUserId());
         } else {
             showSignInDialog();
+            //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
         }
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,65 +81,15 @@ public class MainActivity extends AppCompatActivity {
          tabLayout.setupWithViewPager(viewPager);
     }
 
-    private void addNewUserToDB(User user) {
-        db.collection("users").add(user).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Log.d("USER_", "suc");
-            }
-
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("USER_", "Error updating document", e);
-                    }
-                });
-    }
-
     private void showSignInDialog() {
-        startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .setIsSmartLockEnabled(false)
-                        .build(),
-                RC_SIGN_IN);
+        viewModel.initSignInFlow(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // RC_SIGN_IN is the request code you passed into startActivityForResult(...) when starting the sign in flow.
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            // Successfully signed in
-            if (resultCode == RESULT_OK) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                FirebaseUserMetadata metadata = user.getMetadata();
-                if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
-                    //Snackbar.make(findViewById(R.id.button),"Greetings new user!!!", Snackbar.LENGTH_LONG).show();
-                    Log.d("USER_", "suc");
-                    addNewUserToDB(new User(user.getUid(), user.getDisplayName(), user.getPhotoUrl()));
-                } else {
-                    //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
-                }
-                //Toast.makeText(this, "" + user.getEmail(), Toast.LENGTH_SHORT).show();
-            } else {
-                // Sign in failed
-                if (response == null) {
-                    // User pressed back button
-                    Toast.makeText(this, "sign_in_cancelled", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    Toast.makeText(this, "no_internet_connection", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
-        }
+        viewModel.checkForSignInResult(requestCode, resultCode, data, this);
+        this.recreate();
     }
 
     @Override
