@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         getWindow().setExitTransition(new Fade());
         getWindow().setEnterTransition(new Fade());
-
         if (viewModel.getCurrentUser() != null) {
            // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "suc"+ viewModel.getUserId());
