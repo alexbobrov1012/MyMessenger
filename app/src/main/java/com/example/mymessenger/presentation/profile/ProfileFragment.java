@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.mymessenger.MyApp;
 import com.example.mymessenger.ProfileViewModel;
@@ -51,6 +52,8 @@ public class ProfileFragment extends Fragment {
 
     private Toolbar toolbar;
 
+    private TextView status;
+
     public static ProfileFragment newInstance() {
         return new ProfileFragment();
     }
@@ -68,13 +71,15 @@ public class ProfileFragment extends Fragment {
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
         toolbar = getView().findViewById(R.id.profile_name);
         imageView = getView().findViewById(R.id.profile_pic);
+        status = getView().findViewById(R.id.status_textView);
         viewModel.getUserRef().get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 data = documentSnapshot.toObject(User.class);
                 Log.e("SAFER", data.getPic_url() + " " + data.getName());
                 toolbar.setTitle(data.getName());
-                new DownloadImageTask(imageView).execute(data.getPic_url());
+                viewModel.setImageView(imageView, data.getPic_url());
+                status.setText(data.getStatus());
             }
         });
     }
@@ -99,92 +104,5 @@ public class ProfileFragment extends Fragment {
         Log.e("SAFER", "onStop");
     }
 
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            //Bitmap mIcon11 = null;
-            boolean isNotCached = false;
-            isExternalStorageWritable();
-            File file = getPrivateAlbumStorageDir("Images");
-            File newFile = new File(file, "/" + urldisplay.replace("/", "."));
-            try {
-                isNotCached = newFile.createNewFile(); // true  - file not exists yet, then download it
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(isNotCached) {
-                return downloadAndSaveImage(urldisplay, newFile);
-            } else {
-                return readImage(newFile);
-            }
-
-        }
-
-        private Bitmap readImage(File newFile) {
-            byte[] bytes = new byte[(int) newFile.length()];
-            FileInputStream inputStream;
-            try {
-                inputStream = new FileInputStream(newFile);
-                inputStream.read(bytes);
-                inputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(bytes);
-            return BitmapFactory.decodeStream(arrayInputStream);
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-
-        public boolean isExternalStorageWritable() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                return true;
-            }
-            return false;
-        }
-
-        public File getPrivateAlbumStorageDir(String albumName) {
-            // Get the directory for the app's private pictures directory.
-            File file = new File(MyApp.appInstance.getExternalFilesDir(Environment.DIRECTORY_PICTURES), albumName);
-            if (!file.mkdirs()) {
-                Log.e(TAG, "Directory not created");
-            }
-            return file;
-        }
-
-        private Bitmap downloadAndSaveImage(String urldisplay, File newFile) {
-            Bitmap image = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                image = BitmapFactory.decodeStream(in);
-                Log.e(TAG, "download - ok");
-            } catch (Exception e) {
-                Log.e(TAG, "download error " + e.getMessage());
-                e.printStackTrace();
-            }
-            FileOutputStream outputStream;
-            try {
-                outputStream = new FileOutputStream(newFile);
-                if (image != null) {
-                    image.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
-                }
-                outputStream.flush();
-                outputStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return image;
-        }
-    }
 
 }

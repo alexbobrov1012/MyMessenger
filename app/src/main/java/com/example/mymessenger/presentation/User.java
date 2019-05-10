@@ -9,6 +9,8 @@ public class User {
 
     private String pic_url;
 
+    private String status;
+
     public User() {
     }
 
@@ -20,6 +22,17 @@ public class User {
         } catch (Exception e) {
             this.pic_url = "null";
         }
+    }
+
+    public User(String id, String name, Uri pic_url, String status) {
+        this.id = id;
+        this.name = name;
+        try {
+            this.pic_url = pic_url.toString();
+        } catch (Exception e) {
+            this.pic_url = "null";
+        }
+        this.status = status;
 
     }
 
@@ -45,5 +58,12 @@ public class User {
 
     public void setPic_url(String pic_url) {
         this.pic_url = pic_url;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

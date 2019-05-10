@@ -2,4 +2,6 @@
     <string name="app_name">MyMessenger</string>
     <string name="action_settings">Settings</string>
     <string name="profile_name">Username</string>
+    <string name="status">Status:</string>
+    <string name="status_content">Empty status</string>
 </resources>

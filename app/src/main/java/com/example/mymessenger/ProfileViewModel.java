@@ -1,6 +1,7 @@
 package com.example.mymessenger;
 
 import android.arch.lifecycle.ViewModel;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -13,12 +14,16 @@ public class ProfileViewModel extends ViewModel {
     public ProfileViewModel() {
 
     }
-
+    // read user info from DB
     public DocumentReference getUserRef() {
         currentUser = FirebaseAuth.getInstance();
         return FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(currentUser.getUid());
+    }
+
+    public void setImageView(ImageView imageView, String url) {
+        MyApp.appInstance.getRepoInstance().downloadImageTask(imageView, url);
     }
 
 }
