@@ -55,6 +55,9 @@ public class Repository {
         new DownloadImageTask(imageView).execute(url);
     }
 
+    private void uploadUserIcon(String url) {
+        new UploadImageTask().execute(url);
+    }
     public Intent getSignInIntent() {
         return signInIntent;
     }
@@ -105,5 +108,8 @@ public class Repository {
                     public void onFailure(@NonNull Exception e) {
                         Log.w(TAG, "Error updating document", e);
                     }});
+        if(user.getPic_url() != null) {
+
+        }
     }
 }
