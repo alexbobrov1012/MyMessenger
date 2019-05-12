@@ -27,14 +27,10 @@ public class ImageManager {
         storageRefImage.child(fileImage.getName()).putFile(file);
     }
 
-    public static void downloadImage(String fromFileName, final File toFileImage, final ImageView imageView) {
+    public static Bitmap downloadImage(String fromFileName, final File toFileImage) {
         Log.e(TAG, "downloadImage storage");
-        storageRefImage.child(fromFileName).getFile(toFileImage).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                imageView.setImageBitmap(BitmapFactory.decodeFile(toFileImage.getAbsolutePath()));
-            }
-        });
+        storageRefImage.child(fromFileName).getFile(toFileImage);
+        return BitmapFactory.decodeFile(toFileImage.getAbsolutePath());
     }
 
     public static void downloadUserPhoto(String url) {

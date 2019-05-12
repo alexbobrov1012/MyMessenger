@@ -49,8 +49,6 @@ public class ProfileFragment extends Fragment {
     private static final String TAG = "PROFILE";
     private ProfileViewModel viewModel;
 
-    private User data;
-
     private ImageView imageView;
 
     private Toolbar toolbar;
@@ -62,50 +60,76 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.profile_fragment, container, false);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.e("SAFER", "Created");
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate");
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
-        toolbar = getView().findViewById(R.id.profile_name);
-        imageView = getView().findViewById(R.id.profile_pic);
-        status = getView().findViewById(R.id.status_textView);
         viewModel.getUserRef().get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                data = documentSnapshot.toObject(User.class);
-                Log.e("SAFER", data.getPic_url() + " " + data.getName());
+                User data = documentSnapshot.toObject(User.class);
+                toolbar = getView().findViewById(R.id.profile_name);
+                imageView = getView().findViewById(R.id.profile_pic);
+                status = getView().findViewById(R.id.status_textView);
+                imageView.setImageBitmap(MyApp.appInstance.getRepoInstance().getImage(data.getPic_url()));
                 toolbar.setTitle(data.getName());
-                //viewModel.setImageView(imageView, data.getPic_url());
-                viewModel.getImage(data.getPic_url(), imageView);
                 status.setText(data.getStatus());
             }
         });
     }
 
     @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        Log.e(TAG, "onCreateView");
+        return inflater.inflate(R.layout.profile_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Log.e(TAG, "onViewCreated");
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+            if(viewModel.dataReady) {
+                toolbar = getView().findViewById(R.id.profile_name);
+                imageView = getView().findViewById(R.id.profile_pic);
+                status = getView().findViewById(R.id.status_textView);
+                imageView.setImageBitmap(viewModel.getUserIcon());
+                toolbar.setTitle(viewModel.getUserName());
+                status.setText(viewModel.getUserStatus());
+            }
+            Log.e(TAG, "onActivityCreated");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.e(TAG, "onStart");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        Log.e("SAFER", "onResume");
+        Log.e(TAG, "onResume");
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.e("SAFER", "onPause");
+        Log.e(TAG, "onPause");
 
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.e("SAFER", "onStop");
+        Log.e(TAG, "onStop");
     }
 
 

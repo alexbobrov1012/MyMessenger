@@ -28,8 +28,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -62,23 +66,24 @@ public class Repository {
         new DownloadImageTask(imageView).execute(url);
     }
 
-    public void getImage(String name, ImageView imageView) {
+    public Bitmap getImage(String name) {
         File imageFile = new File(MyApp.appInstance.getExternalImageFolder(),
                 "/" +  name.replace("/","."));
         Bitmap image = null;
         try {
             if(imageFile.createNewFile()) {
                 // empty file created then download it
-                downloadImage(name.replace("/","."), imageFile, imageView);
+                image = downloadImage(name.replace("/","."), imageFile);
             } else {
                 // otherwise image already exists external
                 Log.d(TAG, "image read external");
-                imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
+                image = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return image;
     }
 
     private void uploadImage(final File fileImage) {
@@ -91,14 +96,15 @@ public class Repository {
         });
     }
 
-    private void downloadImage(final String fromFileName, final File toFileImage, final ImageView imageView) {
+    private Bitmap downloadImage(final String fromFileName, final File toFileImage) {
         Executor executor =  Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                ImageManager.downloadImage(fromFileName, toFileImage, imageView);
+                ImageManager.downloadImage(fromFileName, toFileImage);
             }
         });
+        return BitmapFactory.decodeFile(toFileImage.getAbsolutePath());
     }
 
     public Intent getSignInIntent() {
