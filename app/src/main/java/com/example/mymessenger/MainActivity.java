@@ -38,6 +38,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
          viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
          viewPager.setAdapter(viewPagerAdapter);
          tabLayout.setupWithViewPager(viewPager);
+
     }
 
     private void showSignInDialog() {

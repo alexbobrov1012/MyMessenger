@@ -16,8 +16,6 @@ public class MyApp extends Application {
 
     public static MyApp appInstance;
 
-    private StorageReference storageRefImage = FirebaseStorage.getInstance().getReference().child("Images");
-
     private File externalImageFolder;
 
     @Override
@@ -25,15 +23,12 @@ public class MyApp extends Application {
         super.onCreate();
         appInstance = this;
         repoInstance = new Repository();
+
         externalImageFolder = getPrivateAlbumStorageDir("Images");
     }
 
     public Repository getRepoInstance() {
         return repoInstance;
-    }
-
-    public StorageReference getStorageRefImage() {
-        return storageRefImage;
     }
 
     private File getPrivateAlbumStorageDir(String albumName) {

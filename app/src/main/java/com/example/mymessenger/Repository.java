@@ -3,6 +3,9 @@ package com.example.mymessenger;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,8 +24,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -55,9 +62,45 @@ public class Repository {
         new DownloadImageTask(imageView).execute(url);
     }
 
-    private void uploadUserIcon(String url) {
-        new UploadImageTask().execute(url);
+    public void getImage(String name, ImageView imageView) {
+        File imageFile = new File(MyApp.appInstance.getExternalImageFolder(),
+                "/" +  name.replace("/","."));
+        Bitmap image = null;
+        try {
+            if(imageFile.createNewFile()) {
+                // empty file created then download it
+                downloadImage(name.replace("/","."), imageFile, imageView);
+            } else {
+                // otherwise image already exists external
+                Log.d(TAG, "image read external");
+                imageView.setImageBitmap(BitmapFactory.decodeFile(imageFile.getAbsolutePath()));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    private void uploadImage(final File fileImage) {
+        Executor executor =  Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                ImageManager.uploadImage(fileImage);
+            }
+        });
+    }
+
+    private void downloadImage(final String fromFileName, final File toFileImage, final ImageView imageView) {
+        Executor executor =  Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                ImageManager.downloadImage(fromFileName, toFileImage, imageView);
+            }
+        });
+    }
+
     public Intent getSignInIntent() {
         return signInIntent;
     }
@@ -95,7 +138,7 @@ public class Repository {
         }
     }
 
-    private void addNewUserToDB(User user) {
+    private void addNewUserToDB(final User user) {
         Log.d(TAG, "userid = "+ user.getId());
         dataBase.collection("users").document(user.getId()).set(user).addOnSuccessListener(
                 new OnSuccessListener<Void>() {
@@ -109,6 +152,13 @@ public class Repository {
                         Log.w(TAG, "Error updating document", e);
                     }});
         if(user.getPic_url() != null) {
+            Executor executor =  Executors.newSingleThreadExecutor();
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    ImageManager.downloadUserPhoto(user.getPic_url());
+                }
+            });
 
         }
     }

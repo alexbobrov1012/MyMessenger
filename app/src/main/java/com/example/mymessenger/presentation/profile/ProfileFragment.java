@@ -23,6 +23,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.mymessenger.ImageManager;
 import com.example.mymessenger.MyApp;
 import com.example.mymessenger.ProfileViewModel;
 import com.example.mymessenger.R;
@@ -40,6 +41,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ProfileFragment extends Fragment {
 
@@ -78,7 +81,8 @@ public class ProfileFragment extends Fragment {
                 data = documentSnapshot.toObject(User.class);
                 Log.e("SAFER", data.getPic_url() + " " + data.getName());
                 toolbar.setTitle(data.getName());
-                viewModel.setImageView(imageView, data.getPic_url());
+                //viewModel.setImageView(imageView, data.getPic_url());
+                viewModel.getImage(data.getPic_url(), imageView);
                 status.setText(data.getStatus());
             }
         });

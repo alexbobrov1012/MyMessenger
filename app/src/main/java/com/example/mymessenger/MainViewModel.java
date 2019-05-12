@@ -33,4 +33,5 @@ public class MainViewModel extends ViewModel {
     public void checkForSignInResult(int requestCode, int resultCode, @Nullable Intent data, Context context) {
         MyApp.appInstance.getRepoInstance().checkForSignInResult(requestCode, resultCode, data, context);
     }
+
 }

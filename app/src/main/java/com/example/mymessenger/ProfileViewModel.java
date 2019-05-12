@@ -1,6 +1,7 @@
 package com.example.mymessenger;
 
 import android.arch.lifecycle.ViewModel;
+import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +25,10 @@ public class ProfileViewModel extends ViewModel {
 
     public void setImageView(ImageView imageView, String url) {
         MyApp.appInstance.getRepoInstance().downloadImageTask(imageView, url);
+    }
+
+    public void getImage(String name, ImageView imageView) {
+        MyApp.appInstance.getRepoInstance().getImage(name, imageView);
     }
 
 }

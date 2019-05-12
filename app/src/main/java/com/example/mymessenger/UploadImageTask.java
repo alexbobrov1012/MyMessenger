@@ -18,25 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 // upload user's picture to storage
-public class UploadImageTask extends AsyncTask<String,Void, Void> {
+/*public class UploadImageTask extends AsyncTask<File,Void, Void> {
     private static final String TAG = "UPLOAD_IMAGE";
     // TODO: split into tasks with local File and with URL params
     @Override
-    protected Void doInBackground(String... items) {
-        String item = items[0];
-        if(item.contains("/")) {
-            //it's url then download it and save local and to storage(in case we got new user with photoUrl)
-            File newFile = new File(MyApp.appInstance.getExternalImageFolder(),
-                    "/" + item.replace("/", "."));
-            try {
-                newFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            downloadAndSaveImage(item, newFile);
-        } else {
-
-        }
+    protected Void doInBackground(File... files) {
+        File imageFile = files[0];
+        uploadImageToStorage(imageFile);
     }
 
     // get local picture and upload to storage
@@ -83,3 +71,4 @@ public class UploadImageTask extends AsyncTask<String,Void, Void> {
         return false;
     }
 }
+*/
