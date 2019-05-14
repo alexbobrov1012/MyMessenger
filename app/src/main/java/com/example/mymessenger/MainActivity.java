@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "USER_AUTH";
+    private static final String TAG = "MAIN";
 
     Button button;
 
@@ -58,28 +58,30 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_main);
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         getWindow().setExitTransition(new Fade());
         getWindow().setEnterTransition(new Fade());
-        if (viewModel.getCurrentUser() != null) {
+        if (viewModel.getUserInstance() != null) {
            // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
-            Log.d(TAG, "suc"+ viewModel.getUserId());
+            Log.d(TAG, "Successfully signed in"+ viewModel.getUserId());
         } else {
             showSignInDialog();
             //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
         }
+        viewModel.setCurrentUser(viewModel.getUserInstance().getUid());
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-         tabLayout = findViewById(R.id.tabs);
-         viewPager = findViewById(R.id.viewPager);
-         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-         viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
-         viewPagerAdapter.addFragment(new UsersFragment(), "Users");
-         viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
-         viewPager.setAdapter(viewPagerAdapter);
-         tabLayout.setupWithViewPager(viewPager);
+        tabLayout = findViewById(R.id.tabs);
+        viewPager = findViewById(R.id.viewPager);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
+        viewPagerAdapter.addFragment(new UsersFragment(), "Users");
+        viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
     }
 
@@ -91,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         viewModel.checkForSignInResult(requestCode, resultCode, data, this);
-        this.recreate();
+        viewModel.setCurrentUser(viewModel.getUserInstance().getUid());
+        //this.recreate();
+        viewPager.setCurrentItem(0);
     }
 
     @Override

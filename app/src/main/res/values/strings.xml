@@ -4,4 +4,8 @@
     <string name="profile_name">Username</string>
     <string name="status">Status:</string>
     <string name="status_content">Empty status</string>
+    <string name="title_activity_edit_profile">EditProfileActivity</string>
+    <string name="edit_profile_photo">Change icon:</string>
+    <string name="edit_profile_name">Change name:</string>
+    <string name="edit_profile_status">Change status:</string>
 </resources>

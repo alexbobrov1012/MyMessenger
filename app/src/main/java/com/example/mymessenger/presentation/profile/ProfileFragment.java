@@ -2,6 +2,7 @@ package com.example.mymessenger.presentation.profile;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SupportActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +30,7 @@ import com.example.mymessenger.MyApp;
 import com.example.mymessenger.ProfileViewModel;
 import com.example.mymessenger.R;
 import com.example.mymessenger.presentation.User;
+import com.example.mymessenger.presentation.profile.edit.EditProfileActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -62,20 +65,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(TAG, "onCreate");
         viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
-        viewModel.getUserRef().get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User data = documentSnapshot.toObject(User.class);
-                toolbar = getView().findViewById(R.id.profile_name);
-                imageView = getView().findViewById(R.id.profile_pic);
-                status = getView().findViewById(R.id.status_textView);
-                imageView.setImageBitmap(MyApp.appInstance.getRepoInstance().getImage(data.getPic_url()));
-                toolbar.setTitle(data.getName());
-                status.setText(data.getStatus());
-            }
-        });
+        viewModel.initData();
+        Log.e(TAG, "onCreate");
+
     }
 
     @Override
@@ -88,21 +81,23 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        FloatingActionButton fab = getView().findViewById(R.id.profile_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editActivity = new Intent(getActivity(), EditProfileActivity.class);
+                startActivity(editActivity);
+            }
+        });
         Log.e(TAG, "onViewCreated");
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-            if(viewModel.dataReady) {
-                toolbar = getView().findViewById(R.id.profile_name);
-                imageView = getView().findViewById(R.id.profile_pic);
-                status = getView().findViewById(R.id.status_textView);
-                imageView.setImageBitmap(viewModel.getUserIcon());
-                toolbar.setTitle(viewModel.getUserName());
-                status.setText(viewModel.getUserStatus());
-            }
+
+
+
             Log.e(TAG, "onActivityCreated");
     }
 
@@ -115,6 +110,13 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        viewModel.initData();
+        toolbar = getView().findViewById(R.id.profile_name);
+        imageView = getView().findViewById(R.id.profile_pic);
+        status = getView().findViewById(R.id.status_textView);
+        imageView.setImageBitmap(viewModel.getUserIcon());
+        toolbar.setTitle(viewModel.getUserName());
+        status.setText(viewModel.getUserStatus());
         Log.e(TAG, "onResume");
 
     }
@@ -122,6 +124,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+
         Log.e(TAG, "onPause");
 
     }

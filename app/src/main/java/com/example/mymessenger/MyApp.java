@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Environment;
 import android.util.Log;
 
+import com.example.mymessenger.presentation.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -17,6 +18,8 @@ public class MyApp extends Application {
     public static MyApp appInstance;
 
     private File externalImageFolder;
+
+
 
     @Override
     public void onCreate() {
@@ -43,4 +46,5 @@ public class MyApp extends Application {
     public File getExternalImageFolder() {
         return externalImageFolder;
     }
+
 }

@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainViewModel extends ViewModel {
-    public FirebaseUser getCurrentUser() {
+    public FirebaseUser getUserInstance() {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
@@ -32,6 +32,10 @@ public class MainViewModel extends ViewModel {
 
     public void checkForSignInResult(int requestCode, int resultCode, @Nullable Intent data, Context context) {
         MyApp.appInstance.getRepoInstance().checkForSignInResult(requestCode, resultCode, data, context);
+    }
+
+    public void setCurrentUser(String userId) {
+        MyApp.appInstance.getRepoInstance().setUserInstance(userId);
     }
 
 }

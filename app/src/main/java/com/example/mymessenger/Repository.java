@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.File;
@@ -48,6 +49,8 @@ public class Repository {
     private Intent signInIntent;
 
     private FirebaseFirestore dataBase;
+
+    private User userInstance;
 
     public Repository() {
         providers = Arrays.asList(
@@ -129,6 +132,7 @@ public class Repository {
                 } else {
                     //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
                 }
+
             } else {
                 // Sign in failed
                 if (response == null) {
@@ -150,7 +154,7 @@ public class Repository {
                 new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "suc");
+                        Log.d(TAG, "User added to db");
                     }})
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -167,5 +171,27 @@ public class Repository {
             });
 
         }
+    }
+    public void setUserInstance(String userId) {
+        dataBase.collection("users").document(userId).get().addOnSuccessListener(
+                new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Log.d(TAG, "CurrentUser set");
+                User data = documentSnapshot.toObject(User.class);
+                userInstance = data;
+            }
+        })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error setting user", e);
+                        userInstance = new User();
+                    }
+                });
+    }
+
+    public User getUserInstance() {
+        return userInstance;
     }
 }
