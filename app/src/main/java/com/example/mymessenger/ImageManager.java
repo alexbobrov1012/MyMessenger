@@ -51,6 +51,11 @@ public class ImageManager {
             Log.e(TAG, "download image error " + e.getMessage());
             e.printStackTrace();
         }
+        saveImageExternal(image, newFile);
+        uploadImage(newFile);
+    }
+
+    public static void saveImageExternal(Bitmap image, File newFile) {
         if(isExternalStorageWritable()) {
             FileOutputStream outputStream;
             try {
@@ -66,9 +71,7 @@ public class ImageManager {
                 e.printStackTrace();
             }
         }
-        uploadImage(newFile);
     }
-
     private static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {

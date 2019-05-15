@@ -95,9 +95,13 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
-
+        viewModel.initData();
+        toolbar = getView().findViewById(R.id.profile_name);
+        imageView = getView().findViewById(R.id.profile_pic);
+        status = getView().findViewById(R.id.status_textView);
+        imageView.setImageBitmap(viewModel.getUserIcon());
+        toolbar.setTitle(viewModel.getUserName());
+        status.setText(viewModel.getUserStatus());
             Log.e(TAG, "onActivityCreated");
     }
 
@@ -110,13 +114,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.initData();
-        toolbar = getView().findViewById(R.id.profile_name);
-        imageView = getView().findViewById(R.id.profile_pic);
-        status = getView().findViewById(R.id.status_textView);
-        imageView.setImageBitmap(viewModel.getUserIcon());
-        toolbar.setTitle(viewModel.getUserName());
-        status.setText(viewModel.getUserStatus());
+
         Log.e(TAG, "onResume");
 
     }

@@ -8,4 +8,6 @@
     <string name="edit_profile_photo">Change icon:</string>
     <string name="edit_profile_name">Change name:</string>
     <string name="edit_profile_status">Change status:</string>
+    <string name="edit_profile_image_set_suc">Your icon changed</string>
+    <string name="edit_profile_image_set_fail">Failed icon set</string>
 </resources>

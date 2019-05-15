@@ -1,5 +1,6 @@
 package com.example.mymessenger.presentation.profile.edit;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -10,19 +11,28 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.example.mymessenger.EditProfileViewModel;
 import com.example.mymessenger.R;
 
-public class EditProfileActivity extends AppCompatActivity {
+public class EditProfileActivity extends AppCompatActivity implements TextView.OnEditorActionListener {
     private static final String TAG = "EDITPROFILE";
     private ImageButton takeCameraButton;
 
     private ImageButton takeFileButton;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private EditText nameEditText;
+
+    private EditText statusEditText;
+
+    private EditProfileViewModel viewModel;
 
     LinearLayout layout;
 
@@ -30,6 +40,7 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+        viewModel = ViewModelProviders.of(this).get(EditProfileViewModel.class);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -38,31 +49,39 @@ public class EditProfileActivity extends AppCompatActivity {
         takeCameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                takeCameraPhotoIntent();
             }
         });
         takeFileButton = findViewById(R.id.FileImageButton);
+        takeFileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takeGalleryPhotoIntent();
+            }
+        });
         layout = findViewById(R.id.photoLayout);
+        layout.setBackground(new BitmapDrawable(viewModel.getUserPhoto()));
+        nameEditText = findViewById(R.id.nameEditText);
+        nameEditText.setText(viewModel.getUserName());
+        nameEditText.setOnEditorActionListener(this);
+        statusEditText = findViewById(R.id.statusEditText);
+        statusEditText.setText(viewModel.getUserStatus());
+        statusEditText.setOnEditorActionListener(this);
         Log.d(TAG, "onCreate");
     }
 
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
+    private void takeCameraPhotoIntent() {
+        viewModel.startCameraActivity(this);
+    }
+
+    private void takeGalleryPhotoIntent() {
+        viewModel.startGalleryActivity(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            BitmapDrawable background = new BitmapDrawable(imageBitmap);
-            layout.setBackground(background);
-            Log.d(TAG, "onActivityResult");
-
-        }
+        BitmapDrawable background = viewModel.onTakePhotoActivitiesResult(requestCode, resultCode, data, this);
+        layout.setBackground(background);
     }
 
     @Override
@@ -72,5 +91,16 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
 
-
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_GO) {
+            if(v.getId() == R.id.nameEditText) {
+                viewModel.setUserName(nameEditText.getText().toString());
+            } else if(v.getId() == R.id.statusEditText) {
+                viewModel.setUserStatus(statusEditText.getText().toString());
+            }
+            Log.d(TAG, "Editing");
+        }
+        return false;
+    }
 }

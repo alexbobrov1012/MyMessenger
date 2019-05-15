@@ -5,12 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.mymessenger.presentation.User;
@@ -40,7 +44,11 @@ import static android.app.Activity.RESULT_OK;
 
 public class Repository {
 
-    private static final int RC_SIGN_IN = 3228;
+    private static final int RC_SIGN_IN = 1012;
+
+    private static final int RC_CAMERA_PHOTO = 2013;
+
+    private static final int RC_GALLERY_PHOTO = 2014;
 
     private static final String TAG = "REPO";
 
@@ -118,6 +126,19 @@ public class Repository {
         activity.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    public void startCameraActivity(Activity activity) {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        activity.startActivityForResult(takePictureIntent, RC_CAMERA_PHOTO);
+
+    }
+
+    public void startGalleryActivity(Activity activity) {
+        Intent takePictureIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(takePictureIntent, RC_GALLERY_PHOTO);
+        }
+    }
+
     public void checkForSignInResult(int requestCode, int resultCode, @Nullable Intent data, Context context) {
         if (requestCode == RC_SIGN_IN) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
@@ -179,6 +200,7 @@ public class Repository {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Log.d(TAG, "CurrentUser set");
                 User data = documentSnapshot.toObject(User.class);
+                data.setPic_url(data.getPic_url().replace("/","."));
                 userInstance = data;
             }
         })
@@ -194,4 +216,45 @@ public class Repository {
     public User getUserInstance() {
         return userInstance;
     }
+
+    public Bitmap getUserImage() {
+        File file = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
+        return BitmapFactory.decodeFile(file.getAbsolutePath());
+    }
+
+    public BitmapDrawable takeProfilePhoto(int requestCode, int resultCode, Intent data, Context context) {
+        Bitmap imageBitmap = null;
+        if (requestCode == RC_CAMERA_PHOTO && resultCode == RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                imageBitmap = (Bitmap) extras.get("data");
+                File newImageFile = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
+                ImageManager.saveImageExternal(imageBitmap, newImageFile);
+                Toast.makeText(context, R.string.edit_profile_image_set_suc, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, R.string.edit_profile_image_set_fail, Toast.LENGTH_SHORT).show();
+            }
+
+            Log.d(TAG, "onActivityResultCAMERA");
+        } else if (requestCode == RC_GALLERY_PHOTO && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri contentURI = data.getData();
+                try {
+                    imageBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+                    File newImageFile = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
+                    ImageManager.saveImageExternal(imageBitmap, newImageFile);
+                    Toast.makeText(context, R.string.edit_profile_image_set_suc, Toast.LENGTH_SHORT).show();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, R.string.edit_profile_image_set_fail, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            Log.d(TAG, "onActivityResultGALLERY");
+        }
+        return new BitmapDrawable(imageBitmap);
+    }
 }
+
+
