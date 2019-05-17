@@ -4,13 +4,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,7 +27,20 @@ public class ImageManager {
 
     public static void uploadImage(File fileImage) {
         Uri file = Uri.fromFile(fileImage);
-        storageRefImage.child(fileImage.getName()).putFile(file);
+        storageRefImage.child(fileImage.getName()).putFile(file).addOnSuccessListener(
+                new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.e(TAG, "image uploaded successfully");
+                    }
+                }
+        )
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "image upload fail");
+                 }
+        });
     }
 
     public static Bitmap downloadImage(String fromFileName, final File toFileImage) {

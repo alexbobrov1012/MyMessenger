@@ -23,6 +23,7 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -43,8 +45,6 @@ import java.util.concurrent.Future;
 import static android.app.Activity.RESULT_OK;
 
 public class Repository {
-
-    private static final int RC_SIGN_IN = 1012;
 
     private static final int RC_CAMERA_PHOTO = 2013;
 
@@ -57,6 +57,10 @@ public class Repository {
     private Intent signInIntent;
 
     private FirebaseFirestore dataBase;
+
+    public void setUserInstance(User userInstance) {
+        this.userInstance = userInstance;
+    }
 
     private User userInstance;
 
@@ -108,13 +112,7 @@ public class Repository {
     }
 
     private Bitmap downloadImage(final String fromFileName, final File toFileImage) {
-        Executor executor =  Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                ImageManager.downloadImage(fromFileName, toFileImage);
-            }
-        });
+        ImageManager.downloadImage(fromFileName, toFileImage);
         return BitmapFactory.decodeFile(toFileImage.getAbsolutePath());
     }
 
@@ -122,8 +120,8 @@ public class Repository {
         return signInIntent;
     }
 
-    public void startSignInFlow(Activity activity) {
-        activity.startActivityForResult(signInIntent, RC_SIGN_IN);
+    public void startSignInFlow(Activity activity, int code) {
+        activity.startActivityForResult(signInIntent, code);
     }
 
     public void startCameraActivity(Activity activity) {
@@ -139,8 +137,7 @@ public class Repository {
         }
     }
 
-    public void checkForSignInResult(int requestCode, int resultCode, @Nullable Intent data, Context context) {
-        if (requestCode == RC_SIGN_IN) {
+    public void checkForSignInResult(int resultCode, @Nullable Intent data, Context context) {
             IdpResponse response = IdpResponse.fromResultIntent(data);
             // Successfully signed in
             if (resultCode == RESULT_OK) {
@@ -166,11 +163,24 @@ public class Repository {
                     return;
                 }
             }
-        }
     }
 
+    public void updateUserInDB() {
+        Log.d(TAG, "updateUser userId = "+ userInstance.getId());
+        dataBase.collection("users").document(userInstance.getId()).set(userInstance).addOnSuccessListener(
+                new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "User updated to db");
+                    }})
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                    }});
+    }
     private void addNewUserToDB(final User user) {
-        Log.d(TAG, "userid = "+ user.getId());
+        Log.d(TAG, "addNewUserToDB userId = "+ user.getId());
         dataBase.collection("users").document(user.getId()).set(user).addOnSuccessListener(
                 new OnSuccessListener<Void>() {
                     @Override
@@ -190,17 +200,18 @@ public class Repository {
                     ImageManager.downloadUserPhoto(user.getPic_url());
                 }
             });
-
         }
     }
-    public void setUserInstance(String userId) {
-        dataBase.collection("users").document(userId).get().addOnSuccessListener(
+    public Task<DocumentSnapshot> fetchUser(String userId) {
+        /*dataBase.collection("users").document(userId).get()  .addOnSuccessListener(
                 new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Log.d(TAG, "CurrentUser set");
                 User data = documentSnapshot.toObject(User.class);
                 data.setPic_url(data.getPic_url().replace("/","."));
+                Log.d(TAG, data.getName());
+                //data.setName("dasf");
                 userInstance = data;
             }
         })
@@ -210,7 +221,8 @@ public class Repository {
                         Log.w(TAG, "Error setting user", e);
                         userInstance = new User();
                     }
-                });
+                });*/
+        return dataBase.collection("users").document(userId).get();
     }
 
     public User getUserInstance() {
@@ -224,12 +236,17 @@ public class Repository {
 
     public BitmapDrawable takeProfilePhoto(int requestCode, int resultCode, Intent data, Context context) {
         Bitmap imageBitmap = null;
+        boolean isNewPhoto = false;
+        if(userInstance.getPic_url().equals("null")) {
+            userInstance.setPic_url(UUID.randomUUID().toString());
+        }
+        File newImageFile = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
         if (requestCode == RC_CAMERA_PHOTO && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 imageBitmap = (Bitmap) extras.get("data");
-                File newImageFile = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
                 ImageManager.saveImageExternal(imageBitmap, newImageFile);
+                isNewPhoto = true;
                 Toast.makeText(context, R.string.edit_profile_image_set_suc, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, R.string.edit_profile_image_set_fail, Toast.LENGTH_SHORT).show();
@@ -241,8 +258,8 @@ public class Repository {
                 Uri contentURI = data.getData();
                 try {
                     imageBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
-                    File newImageFile = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
                     ImageManager.saveImageExternal(imageBitmap, newImageFile);
+                    isNewPhoto = true;
                     Toast.makeText(context, R.string.edit_profile_image_set_suc, Toast.LENGTH_SHORT).show();
 
                 } catch (IOException e) {
@@ -252,6 +269,9 @@ public class Repository {
             }
 
             Log.d(TAG, "onActivityResultGALLERY");
+        }
+        if(isNewPhoto) {
+            ImageManager.uploadImage(newImageFile);
         }
         return new BitmapDrawable(imageBitmap);
     }

@@ -43,4 +43,8 @@ public class EditProfileViewModel extends ViewModel {
     public void setUserName(String name) {
         MyApp.appInstance.getRepoInstance().getUserInstance().setName(name);
     }
+
+    public void updateUserInDB() {
+        MyApp.appInstance.getRepoInstance().updateUserInDB();
+    }
 }

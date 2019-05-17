@@ -50,6 +50,9 @@ import java.util.concurrent.Executors;
 public class ProfileFragment extends Fragment {
 
     private static final String TAG = "PROFILE";
+
+    private static final int RC_EDITED = 2014;
+
     private ProfileViewModel viewModel;
 
     private ImageView imageView;
@@ -60,6 +63,19 @@ public class ProfileFragment extends Fragment {
 
     public static ProfileFragment newInstance() {
         return new ProfileFragment();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == RC_EDITED) {
+            MyApp.appInstance.showLoading(getActivity());
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .detach(ProfileFragment.this)
+                    .attach(ProfileFragment.this)
+                    .commit();
+            MyApp.appInstance.hideLoading();
+        }
     }
 
     @Override
@@ -86,28 +102,31 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent editActivity = new Intent(getActivity(), EditProfileActivity.class);
-                startActivity(editActivity);
+                startActivityForResult(editActivity, RC_EDITED);
+
             }
         });
+        toolbar = getView().findViewById(R.id.profile_name);
+        imageView = getView().findViewById(R.id.profile_pic);
+        status = getView().findViewById(R.id.status_textView);
         Log.e(TAG, "onViewCreated");
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel.initData();
-        toolbar = getView().findViewById(R.id.profile_name);
-        imageView = getView().findViewById(R.id.profile_pic);
-        status = getView().findViewById(R.id.status_textView);
-        imageView.setImageBitmap(viewModel.getUserIcon());
-        toolbar.setTitle(viewModel.getUserName());
-        status.setText(viewModel.getUserStatus());
-            Log.e(TAG, "onActivityCreated");
+        Log.e(TAG, "onActivityCreated");
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        viewModel.initData();
+        imageView.setImageBitmap(viewModel.getUserIcon());
+        status.setText(viewModel.getUserStatus());
+        toolbar.setTitle(viewModel.getUserName());
+        Log.e(TAG, viewModel.getUserName());
         Log.e(TAG, "onStart");
     }
 

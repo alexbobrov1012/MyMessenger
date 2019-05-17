@@ -1,9 +1,15 @@
 package com.example.mymessenger;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.example.mymessenger.presentation.LoadingDialog;
 import com.example.mymessenger.presentation.User;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -19,7 +25,7 @@ public class MyApp extends Application {
 
     private File externalImageFolder;
 
-
+    private LoadingDialog loadingDialog;
 
     @Override
     public void onCreate() {
@@ -28,6 +34,7 @@ public class MyApp extends Application {
         repoInstance = new Repository();
 
         externalImageFolder = getPrivateAlbumStorageDir("Images");
+        loadingDialog = new LoadingDialog();
     }
 
     public Repository getRepoInstance() {
@@ -45,6 +52,15 @@ public class MyApp extends Application {
 
     public File getExternalImageFolder() {
         return externalImageFolder;
+    }
+
+    public void showLoading(FragmentActivity activity) {
+        loadingDialog.show(activity.getSupportFragmentManager(), "loading");
+    }
+
+    public void hideLoading() {
+        loadingDialog.dismiss();
+
     }
 
 }

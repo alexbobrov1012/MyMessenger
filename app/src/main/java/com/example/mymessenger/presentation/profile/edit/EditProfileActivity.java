@@ -70,6 +70,12 @@ public class EditProfileActivity extends AppCompatActivity implements TextView.O
         Log.d(TAG, "onCreate");
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        viewModel.updateUserInDB();
+    }
+
     private void takeCameraPhotoIntent() {
         viewModel.startCameraActivity(this);
     }
@@ -93,14 +99,12 @@ public class EditProfileActivity extends AppCompatActivity implements TextView.O
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if (actionId == EditorInfo.IME_ACTION_GO) {
-            if(v.getId() == R.id.nameEditText) {
-                viewModel.setUserName(nameEditText.getText().toString());
-            } else if(v.getId() == R.id.statusEditText) {
-                viewModel.setUserStatus(statusEditText.getText().toString());
-            }
-            Log.d(TAG, "Editing");
+        if(v.getId() == R.id.nameEditText) {
+            viewModel.setUserName(nameEditText.getText().toString());
+        } else if(v.getId() == R.id.statusEditText) {
+            viewModel.setUserStatus(statusEditText.getText().toString());
         }
+        Log.d(TAG, "Editing");
         return false;
     }
 }

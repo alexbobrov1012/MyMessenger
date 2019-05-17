@@ -19,6 +19,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.mymessenger.presentation.LoadingDialog;
 import com.example.mymessenger.presentation.User;
 import com.example.mymessenger.presentation.chat.ChatsFragment;
 import com.example.mymessenger.presentation.profile.ProfileFragment;
@@ -34,6 +35,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
@@ -42,10 +44,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int RC_SIGN_IN = 1012;
 
     private static final String TAG = "MAIN";
-
-    Button button;
 
     private ViewPagerAdapter viewPagerAdapter;
 
@@ -54,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
 
     private MainViewModel viewModel;
+
+    private ProfileFragment profileFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,38 +67,77 @@ public class MainActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         getWindow().setExitTransition(new Fade());
         getWindow().setEnterTransition(new Fade());
-        if (viewModel.getUserInstance() != null) {
+        MyApp.appInstance.showLoading(this);
+        if (viewModel.getAuthUserInstance() != null) {
            // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
             Log.d(TAG, "Successfully signed in"+ viewModel.getUserId());
         } else {
             showSignInDialog();
             //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
         }
-        viewModel.setCurrentUser(viewModel.getUserInstance().getUid());
+        viewModel.fetchUser(viewModel.getAuthUserInstance().getUid()).addOnSuccessListener(
+                new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        User data = documentSnapshot.toObject(User.class);
+                        data.setPic_url(data.getPic_url().replace("/","."));
+                        Log.d(TAG, data.getName());
+                        //data.setName("dasf");
+                        viewModel.setUserInstance(data);
+                        MyApp.appInstance.hideLoading();
+                    }
+                }
+        );
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         tabLayout = findViewById(R.id.tabs);
         viewPager = findViewById(R.id.viewPager);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        profileFragment = new ProfileFragment();
         viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
         viewPagerAdapter.addFragment(new UsersFragment(), "Users");
-        viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
+        viewPagerAdapter.addFragment(profileFragment, "Profile");
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
     }
 
+    private void initCurrentUser() {
+        viewModel.fetchUser(viewModel.getAuthUserInstance().getUid());
+    }
+
     private void showSignInDialog() {
-        viewModel.initSignInFlow(this);
+        viewModel.initSignInFlow(this, RC_SIGN_IN);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        viewModel.checkForSignInResult(requestCode, resultCode, data, this);
-        viewModel.setCurrentUser(viewModel.getUserInstance().getUid());
-        //this.recreate();
-        viewPager.setCurrentItem(0);
+        if(requestCode == RC_SIGN_IN) {
+            MyApp.appInstance.showLoading(this);
+            viewModel.checkForSignInResult(resultCode, data, this);
+            //viewModel.setCurrentUser(viewModel.getUserInstance().getUid());
+            //this.recreate();
+            //viewPager.setCurrentItem(0);
+            viewModel.fetchUser(viewModel.getAuthUserInstance().getUid()).addOnSuccessListener(
+                    new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            Log.d(TAG, "CurrentUser set");
+                            User data = documentSnapshot.toObject(User.class);
+                            data.setPic_url(data.getPic_url().replace("/", "."));
+                            Log.d(TAG, data.getName());
+                            //data.setName("dasf");
+                            viewModel.setUserInstance(data);
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .detach(profileFragment)
+                                    .attach(profileFragment)
+                                    .commit();
+                            MyApp.appInstance.hideLoading();
+                        }
+                    });
+        }
     }
 
     @Override
