@@ -15,12 +15,18 @@ public class UsersRecycleViewAdapter extends RecyclerView.Adapter<UsersRecycleVi
 
     List<User> users;
 
+    OnItemListClickListener listener;
+
+    public UsersRecycleViewAdapter(OnItemListClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     public UsersRecycleViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.user_list_view_item, viewGroup, false);
-        return new UsersRecycleViewHolder(view);
+        return new UsersRecycleViewHolder(view, listener);
     }
 
     @Override
@@ -38,4 +44,9 @@ public class UsersRecycleViewAdapter extends RecyclerView.Adapter<UsersRecycleVi
             return 0;
         return users.size();
     }
+
+    public User getItem(int itemId) {
+        return users.get(itemId);
+    }
+
 }

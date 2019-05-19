@@ -4,10 +4,12 @@
     <string name="profile_name">Username</string>
     <string name="status">Status:</string>
     <string name="status_content">Empty status</string>
-    <string name="title_activity_edit_profile">EditProfileActivity</string>
+    <string name="title_activity_edit_profile">Edit profile</string>
     <string name="edit_profile_photo">Change icon:</string>
     <string name="edit_profile_name">Change name:</string>
     <string name="edit_profile_status">Change status:</string>
     <string name="edit_profile_image_set_suc">Your icon changed</string>
     <string name="edit_profile_image_set_fail">Failed icon set</string>
+    <string name="users_profile_button_message">send a message</string>
+    <string name="title_activity_users_profile">A user profile</string>
 </resources>

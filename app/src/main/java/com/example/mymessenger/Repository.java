@@ -82,6 +82,9 @@ public class Repository {
     }
 
     public Bitmap getImage(String name) {
+        if(name.equals("null")) {
+            return BitmapFactory.decodeResource(MyApp.appInstance.getApplicationContext().getResources(), R.drawable.user_icon);
+        }
         File imageFile = new File(MyApp.appInstance.getExternalImageFolder(),
                 "/" +  name.replace("/","."));
         Bitmap image = null;

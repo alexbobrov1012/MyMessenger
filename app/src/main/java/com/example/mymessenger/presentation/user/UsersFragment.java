@@ -1,6 +1,7 @@
 package com.example.mymessenger.presentation.user;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.example.mymessenger.R;
@@ -22,7 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 
-public class UsersFragment extends Fragment implements EventListener<QuerySnapshot> {
+public class UsersFragment extends Fragment implements EventListener<QuerySnapshot>, OnItemListClickListener{
 
     private static final String TAG = "UsersFragment";
     private UsersViewModel viewModel;
@@ -42,7 +44,7 @@ public class UsersFragment extends Fragment implements EventListener<QuerySnapsh
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(UsersViewModel.class);
         RecyclerView recyclerView = getView().findViewById(R.id.users_recycleView);
-        adapter = new UsersRecycleViewAdapter();
+        adapter = new UsersRecycleViewAdapter(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -70,5 +72,20 @@ public class UsersFragment extends Fragment implements EventListener<QuerySnapsh
             return;
         }
         adapter.setUsers(querySnapshots.toObjects(User.class));
+    }
+
+    @Override
+    public void onItemListClick(int adapterPosition) {
+        //TODO: impl
+        Log.d(TAG, "onItemListClick");
+        Intent intent = new Intent(getActivity(), UsersProfile.class);
+        User extra = adapter.getItem(adapterPosition);
+        Bundle userExtra = new Bundle();
+        Log.d(TAG, extra.getName());
+        userExtra.putString("name", extra.getName());
+        userExtra.putString("status", extra.getStatus());
+        userExtra.putString("picture", extra.getPic_url());
+        intent.putExtras(userExtra);
+        startActivity(intent);
     }
 }
