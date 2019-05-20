@@ -31,14 +31,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -69,8 +73,8 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setEnterTransition(new Fade());
         MyApp.appInstance.showLoading(this);
         if (viewModel.getAuthUserInstance() != null) {
-           // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
-            Log.d(TAG, "Successfully signed in"+ viewModel.getUserId());
+            // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
+            Log.d(TAG, "Successfully signed in" + viewModel.getUserId());
         } else {
             showSignInDialog();
             //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         User data = documentSnapshot.toObject(User.class);
-                        data.setPic_url(data.getPic_url().replace("/","."));
+                        data.setPic_url(data.getPic_url().replace("/", "."));
                         Log.d(TAG, data.getName());
                         //data.setName("dasf");
                         viewModel.setUserInstance(data);
@@ -100,9 +104,10 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-    }
+        Log.d(TAG, new Timestamp(new Date()).toDate().toString());
 
-    private void initCurrentUser() {
+    }
+        private void initCurrentUser() {
         viewModel.fetchUser(viewModel.getAuthUserInstance().getUid());
     }
 

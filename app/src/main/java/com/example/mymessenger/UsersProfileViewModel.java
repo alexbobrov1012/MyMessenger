@@ -6,6 +6,9 @@ import android.os.Bundle;
 
 public class UsersProfileViewModel extends ViewModel {
 
+
+    private String userId;
+
     private String userName;
 
     private String userStatus;
@@ -17,6 +20,7 @@ public class UsersProfileViewModel extends ViewModel {
     }
 
     public void getUserData(Bundle bundle) {
+        userId = bundle.getString("id");
         userName = bundle.getString("name", "NoName");
         userStatus = bundle.getString("status", "EmptyStatus");
         userPicture = bundle.getString("picture", "null");
@@ -35,5 +39,15 @@ public class UsersProfileViewModel extends ViewModel {
         return userPicture;
     }
 
+    public String getUserId() {
+        return userId;
+    }
 
+    public String getCurrentUserName() {
+        return MyApp.appInstance.getRepoInstance().getUserInstance().getName();
+    }
+
+    public String getCurrentUserId() {
+        return MyApp.appInstance.getRepoInstance().getUserInstance().getId();
+    }
 }

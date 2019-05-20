@@ -82,6 +82,7 @@ public class UsersFragment extends Fragment implements EventListener<QuerySnapsh
         User extra = adapter.getItem(adapterPosition);
         Bundle userExtra = new Bundle();
         Log.d(TAG, extra.getName());
+        userExtra.putString("id", extra.getId());
         userExtra.putString("name", extra.getName());
         userExtra.putString("status", extra.getStatus());
         userExtra.putString("picture", extra.getPic_url());

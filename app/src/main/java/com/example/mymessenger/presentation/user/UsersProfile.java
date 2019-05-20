@@ -12,8 +12,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.mymessenger.MessagingManager;
 import com.example.mymessenger.R;
 import com.example.mymessenger.UsersProfileViewModel;
+import com.example.mymessenger.Utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class UsersProfile extends AppCompatActivity {
 
@@ -40,5 +45,15 @@ public class UsersProfile extends AppCompatActivity {
         profilePicImageView.setImageBitmap(viewModel.getProfilePicture(viewModel.getUserPicture()));
         toolbar.setTitle(viewModel.getUserName());
         status.setText(viewModel.getUserStatus());
+        sendMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle userInfo = new Bundle();
+                userInfo.putStringArrayList(Utils.KEY_USERIDS, new ArrayList<String>(Arrays.asList(viewModel.getUserId(), viewModel.getCurrentUserId())));
+                userInfo.putStringArrayList(Utils.KEY_USERNAMES, new ArrayList<String>(Arrays.asList(viewModel.getUserName(), viewModel.getCurrentUserName())));
+                MessagingManager.initChannelForPair(userInfo);
+            }
+        });
     }
+
 }
