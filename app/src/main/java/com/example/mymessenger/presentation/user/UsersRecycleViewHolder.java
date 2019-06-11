@@ -1,14 +1,16 @@
 package com.example.mymessenger.presentation.user;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.mymessenger.MyApp;
 import com.example.mymessenger.R;
-import com.example.mymessenger.presentation.User;
+import com.example.mymessenger.presentation.OnItemListClickListener;
+import com.example.mymessenger.models.User;
 
 public class UsersRecycleViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     private TextView nameView;

@@ -9,15 +9,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.example.mymessenger.presentation.User;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.example.mymessenger.database.AppRoomDatabase;
+import com.example.mymessenger.models.Channel;
+import com.example.mymessenger.models.User;
+import com.example.mymessenger.models.collections.ChannelId;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -27,20 +29,26 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import durdinapps.rxfirebase2.RxFirestore;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -52,10 +60,6 @@ public class Repository {
 
     private static final String TAG = "REPO";
 
-    private List<AuthUI.IdpConfig> providers;
-
-    private Intent signInIntent;
-
     private FirebaseFirestore dataBase;
 
     public void setUserInstance(User userInstance) {
@@ -64,21 +68,83 @@ public class Repository {
 
     private User userInstance;
 
+    private AppRoomDatabase roomDatabase;
+
     public Repository() {
-        providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.PhoneBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
-        signInIntent = AuthUI.getInstance()
-                .createSignInIntentBuilder()
-                .setAvailableProviders(providers)
-                .setIsSmartLockEnabled(false)
-                .build();
         dataBase = FirebaseFirestore.getInstance();
+        roomDatabase = MyApp.appInstance.getRoomDatabase();
     }
 
-    public void downloadImageTask(ImageView imageView, String url) {
-        new DownloadImageTask(imageView).execute(url);
+    public Observable<Channel> getAllUserChannel(Query query) {
+        return RxFirestore.observeQueryRef(query)
+                .toObservable()
+                .flatMap(querySnapshots -> {
+                    return Observable.fromIterable(querySnapshots.getDocuments());
+                })
+                .flatMap(querySnapshot -> {
+                    ChannelId channelId = querySnapshot.toObject(ChannelId.class);
+                    return RxFirestore.getDocument(FirebaseFirestore.getInstance()
+                            .collection("channels").document(channelId.getId()))
+                            .toObservable()
+                            .flatMapSingle(documentSnapshot -> {
+                                Channel tmpChannel = documentSnapshot.toObject(Channel.class);
+                                if(tmpChannel.isPrivate()) {
+                                    tmpChannel = parseChannel(tmpChannel);
+                                }
+                                return Single.just(tmpChannel);
+                            });
+                });
+    }
+
+    private Channel parseChannel(Channel tmpChannel) {
+        int index = 0;
+        String name = tmpChannel.getPrivateMap().get("name").get(0);
+        if(name.equals(MyApp.appInstance.getRepoInstance().getUserInstance().getName())) {
+            index = 1;
+        }
+        Channel newChannel = tmpChannel;
+        newChannel.setName(newChannel.getPrivateMap().get("name").get(index));
+        newChannel.setIcon(newChannel.getPrivateMap().get("icon").get(index));
+        return newChannel;
+    }
+
+    public Single<List<User>> fetchUsers() {
+        return RxFirestore.getCollection(FirebaseFirestore.getInstance().collection("users"))
+                .toSingle()
+                .flatMap(snapshot -> {
+                    List<User> users = snapshot.toObjects(User.class);
+                    return Single.just(users);
+                })
+                .map(users -> {
+                    int idx = 0;
+                    for(int i = 0; i < users.size(); i++) {
+                        if(users.get(i).getId().equals(userInstance.getId())) {
+                            idx = i;
+                            break;
+                        }
+                    }
+                    users.remove(idx);
+                    return users;
+                })
+                .flatMap(users -> putUsersToDatabase(users));
+    }
+
+    public Completable fetchCurrentUser(String id) {
+        return RxFirestore.getDocument(FirebaseFirestore.getInstance()
+                .collection("users").document(id))
+                .toSingle()
+                .flatMapCompletable(documentSnapshot -> {
+                    User user = documentSnapshot.toObject(User.class);
+                    Log.d("DEBUG", user.toString());
+                    userInstance = user;
+                    return Completable.complete();
+                });
+    }
+
+    private Single<List<User>> putUsersToDatabase(List<User> users) {
+        return roomDatabase.userDao().insert(users)
+                .subscribeOn(Schedulers.io())
+                .andThen(Single.just(users));
     }
 
     public Bitmap getImage(String name) {
@@ -119,14 +185,6 @@ public class Repository {
         return BitmapFactory.decodeFile(toFileImage.getAbsolutePath());
     }
 
-    public Intent getSignInIntent() {
-        return signInIntent;
-    }
-
-    public void startSignInFlow(Activity activity, int code) {
-        activity.startActivityForResult(signInIntent, code);
-    }
-
     public void startCameraActivity(Activity activity) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         activity.startActivityForResult(takePictureIntent, RC_CAMERA_PHOTO);
@@ -141,31 +199,31 @@ public class Repository {
     }
 
     public void checkForSignInResult(int resultCode, @Nullable Intent data, Context context) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-            // Successfully signed in
-            if (resultCode == RESULT_OK) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                FirebaseUserMetadata metadata = user.getMetadata();
-                if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
-                    //Snackbar.make(findViewById(R.id.button),"Greetings new user!!!", Snackbar.LENGTH_LONG).show();
-                    Log.d(TAG, "add_db");
-                    addNewUserToDB(new User(user.getUid(), user.getDisplayName(), user.getPhotoUrl()));
-                } else {
-                    //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
-                }
-
+        IdpResponse response = IdpResponse.fromResultIntent(data);
+        // Successfully signed in
+        if (resultCode == RESULT_OK) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseUserMetadata metadata = user.getMetadata();
+            if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
+                //Snackbar.make(findViewById(R.id.button),"Greetings new user!!!", Snackbar.LENGTH_LONG).show();
+                Log.d(TAG, "add_db");
+                addNewUserToDB(new User(user.getUid(), user.getDisplayName(), user.getPhotoUrl()));
             } else {
-                // Sign in failed
-                if (response == null) {
-                    // User pressed back button
-                    Toast.makeText(context, "sign_in_cancelled", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    Toast.makeText(context, "no_internet_connection", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
             }
+
+        } else {
+            // Sign in failed
+            if (response == null) {
+                // User pressed back button
+                Toast.makeText(context, "sign_in_cancelled", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
+                Toast.makeText(context, "no_internet_connection", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
     }
 
     public void updateUserInDB() {
@@ -182,6 +240,7 @@ public class Repository {
                         Log.w(TAG, "Error updating document", e);
                     }});
     }
+
     private void addNewUserToDB(final User user) {
         Log.d(TAG, "addNewUserToDB userId = "+ user.getId());
         dataBase.collection("users").document(user.getId()).set(user).addOnSuccessListener(
@@ -205,36 +264,9 @@ public class Repository {
             });
         }
     }
-    public Task<DocumentSnapshot> fetchUser(String userId) {
-        /*dataBase.collection("users").document(userId).get()  .addOnSuccessListener(
-                new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Log.d(TAG, "CurrentUser set");
-                User data = documentSnapshot.toObject(User.class);
-                data.setPic_url(data.getPic_url().replace("/","."));
-                Log.d(TAG, data.getName());
-                //data.setName("dasf");
-                userInstance = data;
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error setting user", e);
-                        userInstance = new User();
-                    }
-                });*/
-        return dataBase.collection("users").document(userId).get();
-    }
 
     public User getUserInstance() {
         return userInstance;
-    }
-
-    public Bitmap getUserImage() {
-        File file = new File(MyApp.appInstance.getExternalImageFolder(), userInstance.getPic_url());
-        return BitmapFactory.decodeFile(file.getAbsolutePath());
     }
 
     public BitmapDrawable takeProfilePhoto(int requestCode, int resultCode, Intent data, Context context) {

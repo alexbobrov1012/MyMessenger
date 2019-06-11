@@ -1,20 +1,43 @@
 package com.example.mymessenger.presentation.chat;
 
-import android.arch.lifecycle.ViewModelProviders;
+
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.example.mymessenger.ChatsViewModel;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.R;
+import com.example.mymessenger.presentation.OnItemListClickListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 
-public class ChatsFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    private ChatsViewModel mViewModel;
+public class ChatsFragment extends Fragment implements EventListener<QuerySnapshot>, OnItemListClickListener {
+
+    private static final String TAG = "CHATSFRAGMENT_DEBUG";
+
+    private ChatsViewModel viewModel;
+
+    private ChatsRecycleViewAdapter adapter;
+
+    private ListenerRegistration registration;
 
     public static ChatsFragment newInstance() {
         return new ChatsFragment();
@@ -29,8 +52,41 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(ChatsViewModel.class);
-        // TODO: Use the ViewModel
+        viewModel = ViewModelProviders.of(this).get(ChatsViewModel.class);
+        viewModel.getAllUserChannels();
+        RecyclerView recyclerView = getView().findViewById(R.id.chatsRecycleView);
+        adapter = new ChatsRecycleViewAdapter(this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        viewModel.getChannelsList().observe(this, new Observer<List<Channel>>() {
+            @Override
+            public void onChanged(List<Channel> channels) {
+                adapter.setChats(channels);
+            }
+        });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+        registration = viewModel.getQuery().addSnapshotListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause");
+        registration.remove();
+    }
+
+    @Override
+    public void onItemListClick(int adapterPosition) {
+
+    }
+
+    @Override
+    public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+        viewModel.getAllUserChannels();
+    }
 }

@@ -1,8 +1,23 @@
-package com.example.mymessenger.presentation;
+package com.example.mymessenger.models;
 
 import android.net.Uri;
 
-public class User {
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.example.mymessenger.ListConverter;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity(tableName = "users_table")
+public class User implements Serializable {
+
+    @PrimaryKey
+    @NonNull
     private String id;
 
     private String name;
@@ -18,22 +33,21 @@ public class User {
         this.id = id;
         this.name = name;
         try {
-            this.pic_url = pic_url.toString();
+            this.pic_url = pic_url.toString().replace("/", ".");
         } catch (Exception e) {
             this.pic_url = "null";
         }
     }
 
-    public User(String id, String name, Uri pic_url, String status) {
+    public User(String id, String name, Uri pic_url, String status, List<String> channelList) {
         this.id = id;
         this.name = name;
         try {
-            this.pic_url = pic_url.toString();
+            this.pic_url = pic_url.toString().replace("/", ".");
         } catch (Exception e) {
             this.pic_url = "null";
         }
         this.status = status;
-
     }
 
     public String getId() {
@@ -65,5 +79,15 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", pic_url='" + pic_url + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

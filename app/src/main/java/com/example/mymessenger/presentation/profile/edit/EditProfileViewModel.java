@@ -1,11 +1,14 @@
-package com.example.mymessenger;
+package com.example.mymessenger.presentation.profile.edit;
 
 import android.app.Activity;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+
+import androidx.lifecycle.ViewModel;
+
+import com.example.mymessenger.MyApp;
 
 public class EditProfileViewModel extends ViewModel {
     public EditProfileViewModel() {
@@ -25,7 +28,7 @@ public class EditProfileViewModel extends ViewModel {
     }
 
     public Bitmap getUserPhoto() {
-        return MyApp.appInstance.getRepoInstance().getUserImage();
+        return MyApp.appInstance.getRepoInstance().getImage(MyApp.appInstance.getRepoInstance().getUserInstance().getPic_url());
     }
 
     public String getUserName() {

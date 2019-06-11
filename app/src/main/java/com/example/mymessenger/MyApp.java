@@ -1,18 +1,14 @@
 package com.example.mymessenger;
 
-import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import androidx.fragment.app.FragmentActivity;
+import androidx.room.Room;
+
+import com.example.mymessenger.database.AppRoomDatabase;
 import com.example.mymessenger.presentation.LoadingDialog;
-import com.example.mymessenger.presentation.User;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 
@@ -21,24 +17,39 @@ public class MyApp extends Application {
 
     private Repository repoInstance;
 
+    private MainRepository mainRepository;
+
     public static MyApp appInstance;
 
     private File externalImageFolder;
 
     private LoadingDialog loadingDialog;
 
+    private AppRoomDatabase roomDatabase;
+
     @Override
     public void onCreate() {
         super.onCreate();
         appInstance = this;
+        roomDatabase = Room.databaseBuilder(this,
+                AppRoomDatabase.class, "MessengerDB")
+                .build();
         repoInstance = new Repository();
-
+        mainRepository = new MainRepository();
         externalImageFolder = getPrivateAlbumStorageDir("Images");
         loadingDialog = new LoadingDialog();
     }
 
+    public AppRoomDatabase getRoomDatabase() {
+        return roomDatabase;
+    }
+
     public Repository getRepoInstance() {
         return repoInstance;
+    }
+
+    public MainRepository getMainRepository() {
+        return mainRepository;
     }
 
     private File getPrivateAlbumStorageDir(String albumName) {

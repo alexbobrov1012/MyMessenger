@@ -1,13 +1,15 @@
 package com.example.mymessenger.presentation.user;
 
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.mymessenger.R;
-import com.example.mymessenger.presentation.User;
+import com.example.mymessenger.presentation.OnItemListClickListener;
+import com.example.mymessenger.models.User;
 
 import java.util.List;
 

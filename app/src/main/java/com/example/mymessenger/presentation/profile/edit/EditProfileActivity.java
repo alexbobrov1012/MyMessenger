@@ -1,25 +1,20 @@
 package com.example.mymessenger.presentation.profile.edit;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.mymessenger.EditProfileViewModel;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.example.mymessenger.R;
 
 public class EditProfileActivity extends AppCompatActivity implements TextView.OnEditorActionListener {
@@ -86,6 +81,7 @@ public class EditProfileActivity extends AppCompatActivity implements TextView.O
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         BitmapDrawable background = viewModel.onTakePhotoActivitiesResult(requestCode, resultCode, data, this);
         layout.setBackground(background);
     }
