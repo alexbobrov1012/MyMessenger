@@ -27,6 +27,7 @@ public class ChatsRecycleViewHolder extends RecyclerView.ViewHolder implements V
         chatNameTextView = itemView.findViewById(R.id.chatNameTextView);
         lastMessageTextView = itemView.findViewById(R.id.chatLastMessageTextView);
         this.listener = listener;
+        itemView.setOnClickListener(this);
     }
 
     public void bind(Channel model) {
@@ -40,6 +41,6 @@ public class ChatsRecycleViewHolder extends RecyclerView.ViewHolder implements V
 
     @Override
     public void onClick(View v) {
-
+        listener.onItemListClick(getAdapterPosition());
     }
 }

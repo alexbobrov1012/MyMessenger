@@ -25,7 +25,7 @@ public class ChatsRecycleViewAdapter extends RecyclerView.Adapter<ChatsRecycleVi
     }
     @NonNull
     @Override
-    public ChatsRecycleViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ChatsRecycleViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.chat_list_view_item, viewGroup, false);
         return new ChatsRecycleViewHolder(view, listener);
@@ -47,4 +47,9 @@ public class ChatsRecycleViewAdapter extends RecyclerView.Adapter<ChatsRecycleVi
         this.chats = chats;
         notifyDataSetChanged();
     }
+
+    public String getChannelId(int index) {
+        return chats.get(index).getId();
+    }
+
 }

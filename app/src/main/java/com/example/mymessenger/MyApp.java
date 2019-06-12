@@ -23,6 +23,8 @@ public class MyApp extends Application {
 
     private File externalImageFolder;
 
+    private File externalFileFolder;
+
     private LoadingDialog loadingDialog;
 
     private AppRoomDatabase roomDatabase;
@@ -32,11 +34,12 @@ public class MyApp extends Application {
         super.onCreate();
         appInstance = this;
         roomDatabase = Room.databaseBuilder(this,
-                AppRoomDatabase.class, "MessengerDB")
+                AppRoomDatabase.class, "MessengerDB1")
                 .build();
         repoInstance = new Repository();
         mainRepository = new MainRepository();
         externalImageFolder = getPrivateAlbumStorageDir("Images");
+        externalFileFolder = getPrivateFileStorageDir("Files");
         loadingDialog = new LoadingDialog();
     }
 
@@ -61,8 +64,22 @@ public class MyApp extends Application {
         return file;
     }
 
+    private File getPrivateFileStorageDir(String dirName) {
+        // Get the directory for the app's private pictures directory.
+        File file = new File(MyApp.appInstance.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), dirName);
+        if (!file.mkdirs()) {
+            Log.e(TAG, "Directory not created");
+        }
+        return file;
+    }
+
+
     public File getExternalImageFolder() {
         return externalImageFolder;
+    }
+
+    public File getExternalFileFolder() {
+        return externalFileFolder;
     }
 
     public void showLoading(FragmentActivity activity) {

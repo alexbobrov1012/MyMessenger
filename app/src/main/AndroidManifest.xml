@@ -17,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".presentation.chat.messaging.MessagingActivity"
+            android:label="@string/MessagingLabel"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".presentation.user.userprofile.UsersProfile"
             android:label="@string/title_activity_users_profile"
             android:theme="@style/AppTheme.NoActionBar"></activity>

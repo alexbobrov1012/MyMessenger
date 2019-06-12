@@ -19,20 +19,36 @@ public class Message {
 
     private String author;
 
-    private String content;
+    private String contentText;
 
-    private String timestamp;
+    private String contentImage;
+
+    private String contentFile;
+
+    private Date date;
 
     public Message() {
     }
 
-    public Message(String id, String author, String content) {
+
+    public Message(@NonNull String id, String author, String contentText, String contentImage,
+                   String contentFile, Date date) {
         this.id = id;
         this.author = author;
-        this.content = content;
-        this.timestamp = SimpleDateFormat.getDateInstance().format(new Date());
+        this.contentText = contentText;
+        this.contentImage = contentImage;
+        this.contentFile = contentFile;
+        this.date = date;
     }
 
+    @NonNull
+    public String getId() {
+        return id;
+    }
+
+    public void setId(@NonNull String id) {
+        this.id = id;
+    }
 
     public String getAuthor() {
         return author;
@@ -42,28 +58,35 @@ public class Message {
         this.author = author;
     }
 
-    public String getContent() {
-        return content;
+    public String getContentText() {
+        return contentText;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setContentText(String contentText) {
+        this.contentText = contentText;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getContentImage() {
+        return contentImage;
     }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
+    public void setContentImage(String contentImage) {
+        this.contentImage = contentImage;
     }
 
-    public String getId() {
-        return id;
+    public String getContentFile() {
+        return contentFile;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setContentFile(String contentFile) {
+        this.contentFile = contentFile;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 }

@@ -120,6 +120,6 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
 
     @Override
     public void onComplete(@NonNull Task task) {
-        this.recreate();
+        viewModel.userSignInCheck(this);
     }
 }

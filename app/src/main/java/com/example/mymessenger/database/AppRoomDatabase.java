@@ -7,9 +7,8 @@ import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.models.Message;
 import com.example.mymessenger.models.User;
 
-@Database(entities = {User.class, Channel.class, Message.class}, version = 1)
+@Database(entities = {User.class, Channel.class}, version = 1)
 public abstract class AppRoomDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract ChannelDao channelDao();
-    public abstract MessageDao messageDao();
 }

@@ -12,4 +12,6 @@
     <string name="edit_profile_image_set_fail">Failed icon set</string>
     <string name="users_profile_button_message">send a message</string>
     <string name="title_activity_users_profile">A user profile</string>
+    <string name="text_input_filed">Start typing..</string>
+    <string name="MessagingLabel">chat</string>
 </resources>

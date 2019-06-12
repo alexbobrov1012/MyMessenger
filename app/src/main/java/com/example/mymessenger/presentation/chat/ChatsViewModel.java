@@ -1,6 +1,9 @@
 package com.example.mymessenger.presentation.chat;
 
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -10,6 +13,7 @@ import com.example.mymessenger.MyApp;
 import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.models.User;
 import com.example.mymessenger.models.collections.ChannelId;
+import com.example.mymessenger.presentation.chat.messaging.MessagingActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,6 +30,8 @@ import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+
+import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
 public class ChatsViewModel extends ViewModel {
     private Query query;
@@ -61,5 +67,11 @@ public class ChatsViewModel extends ViewModel {
                 });
     }
 
+    public void startMessaging(Context context, String channelId) {
+        Intent intent = new Intent(context.getApplicationContext(), MessagingActivity.class);
+        intent.putExtra("channelId", channelId);
+        intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
+        context.startActivity(intent);
+    }
 }
 
