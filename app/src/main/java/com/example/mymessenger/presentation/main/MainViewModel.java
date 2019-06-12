@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -24,12 +25,28 @@ public class MainViewModel extends ViewModel {
 
     MutableLiveData<Integer> loading = new MutableLiveData<>();
 
+    MutableLiveData<FirebaseUser> auth = new MutableLiveData<>();
+
     public MainViewModel() {
         this.loading.setValue(View.VISIBLE);
+        getAuthUser();
+    }
+
+    private void getAuthUser() {
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                auth.postValue(firebaseAuth.getCurrentUser());
+            }
+        });
     }
 
     public FirebaseUser getAuthUserInstance() {
         return FirebaseAuth.getInstance().getCurrentUser();
+    }
+
+    public MutableLiveData<FirebaseUser> getAuth() {
+        return auth;
     }
 
     public void fetchCurrentUser() {

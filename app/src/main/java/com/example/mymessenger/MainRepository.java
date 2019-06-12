@@ -54,7 +54,6 @@ public class MainRepository {
 
     public void startSignInFlow(Activity activity) {
         activity.startActivityForResult(signInIntent, RC_SIGN_IN);
-        activity.finish();
     }
 
     public void checkForSignInResult(int requestCode, int resultCode, @Nullable Intent data, Context context) {

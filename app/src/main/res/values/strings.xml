@@ -14,4 +14,5 @@
     <string name="title_activity_users_profile">A user profile</string>
     <string name="text_input_filed">Start typing..</string>
     <string name="MessagingLabel">chat</string>
+    <string name="signOut">Sign out</string>
 </resources>

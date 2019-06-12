@@ -64,7 +64,7 @@ public class MessagingActivity extends AppCompatActivity implements EventListene
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.imageView_send) {
-            if(textMessageEditText.getText() != null) {
+            if(textMessageEditText.getText() != null && !textMessageEditText.getText().toString().equals("")) {
                 viewModel.sendMessage(textMessageEditText.getText().toString());
             }
         }

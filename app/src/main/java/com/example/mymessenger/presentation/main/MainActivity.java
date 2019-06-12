@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -66,6 +67,11 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
         progressBar = findViewById(R.id.loadingProgressBarMain);
         progressBar.setVisibility(View.VISIBLE);
         //MyApp.appInstance.showLoading(this);
+        viewModel.auth.observe(this, firebaseUser -> {
+            if(firebaseUser != null) {
+                viewModel.fetchCurrentUser();
+            }
+        });
         viewModel.loading.observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
@@ -86,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
             }
         });
 
-        viewModel.fetchCurrentUser();
+
     }
 
     @Override
@@ -110,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            AuthUI.getInstance()
-                    .signOut(MainActivity.this)
-                    .addOnCompleteListener(this, this);
+            FirebaseAuth.getInstance().signOut();
+            finish();
+            startActivity(new Intent(this, MainActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
