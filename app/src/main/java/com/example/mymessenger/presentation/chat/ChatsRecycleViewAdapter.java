@@ -52,4 +52,8 @@ public class ChatsRecycleViewAdapter extends RecyclerView.Adapter<ChatsRecycleVi
         return chats.get(index).getId();
     }
 
+    public Channel getChannel(int index) {
+        return chats.get(index);
+    }
+
 }

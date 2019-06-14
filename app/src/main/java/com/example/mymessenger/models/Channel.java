@@ -7,6 +7,7 @@ import androidx.room.TypeConverters;
 
 import com.example.mymessenger.MapConverter;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity(tableName = "channels_table")
-public class Channel {
+public class Channel implements Serializable {
 
     @PrimaryKey
     @NonNull

@@ -67,9 +67,9 @@ public class ChatsViewModel extends ViewModel {
                 });
     }
 
-    public void startMessaging(Context context, String channelId) {
+    public void startMessaging(Context context, Channel channel) {
         Intent intent = new Intent(context.getApplicationContext(), MessagingActivity.class);
-        intent.putExtra("channelId", channelId);
+        intent.putExtra("channel", channel);
         intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
         context.startActivity(intent);
     }

@@ -1,5 +1,17 @@
 package com.example.mymessenger.presentation.chat.messaging;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.util.Log;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -15,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import durdinapps.rxfirebase2.RxFirebaseStorage;
 import durdinapps.rxfirebase2.RxFirestore;
@@ -33,9 +47,9 @@ public class MessagingViewModel extends ViewModel {
 
     private StorageReference storageRefImages= FirebaseStorage.getInstance().getReference().child("Images");
 
-    private String imageMessage;
+    private Uri imageMessage;
 
-    private String fileMessage;
+    private Uri fileMessage;
 
     public MessagingViewModel(String channelId) {
         this.channelId = channelId;
@@ -49,28 +63,31 @@ public class MessagingViewModel extends ViewModel {
 
     public void fetchMessages() {
         RxFirestore.observeQueryRef(query)
+                .subscribeOn(Schedulers.io())
                 .flatMapSingle(queryDocumentSnapshots -> {
                     List<Message> messages = queryDocumentSnapshots.toObjects(Message.class);
                     for(Message token : messages) {
-                        getMessageResources(token);
+                       // downloadMessageResources(token);
                     }
-                    return Single.just(messages);
+                    return Single.just(messages);//
                 })
                 .subscribe(messages -> {
                     allMessagesList.postValue(messages);
                 });
     }
 
-    private void getMessageResources(Message token) {
+    private void downloadMessageResources(Message token) {
         if(token.getContentImage() != null) {
             File imageFile = new File(MyApp.appInstance.getExternalImageFolder(),
                     "/" +  token.getContentImage());
             try {
                 if(imageFile.createNewFile()) {
                     // empty file created then download it
-                    RxFirebaseStorage.getFile(storageRefImages, imageFile)
+                    RxFirebaseStorage.getFile(storageRefImages
+                            .child(token.getContentImage()), imageFile)
                             .subscribeOn(Schedulers.io())
-                            .blockingGet();
+                            .toCompletable()
+                            .blockingAwait(4, TimeUnit.SECONDS);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -91,32 +108,82 @@ public class MessagingViewModel extends ViewModel {
         return allMessagesList;
     }
 
-    public String getImageMessage() {
+    public Uri getImageMessage() {
         return imageMessage;
     }
 
-    public void setImageMessage(String imageMessage) {
+    public void setImageMessage(Uri imageMessage) {
         this.imageMessage = imageMessage;
     }
 
-    public String getFileMessage() {
+    public Uri getFileMessage() {
         return fileMessage;
     }
 
-    public void setFileMessage(String fileMessage) {
+    public void setFileMessage(Uri fileMessage) {
         this.fileMessage = fileMessage;
     }
 
     public void sendMessage(String text) {
 
-        Message message = new Message(MyApp.appInstance.getRepoInstance().getUserInstance().getId(),
-                MyApp.appInstance.getRepoInstance().getUserInstance().getName(),
-                text,
-                null,
-                null,
-                Calendar.getInstance().getTime());
+        String imageName = null;
+        String fileName = null;
+        if(imageMessage != null) {
+            imageName = UUID.randomUUID().toString();
+        }
+        if(fileMessage != null) {
+            fileName = UUID.randomUUID().toString();
+        }
+        uploadAttachedFiles(imageName, fileName);
+        if(imageMessage != null) {
+            //Uri file = Uri.fromFile(new File(imageMessage.toString()));
+            //Uri file = Uri.fromFile(new File(Uri.fromFile(imageMessage).toString()));
+            String finalImageName = imageName;
+            String finalFileName = fileName;
+            RxFirebaseStorage.putFile(storageRefImages.child(imageName), imageMessage)
+                    .subscribeOn(Schedulers.io())
+                    .doOnSuccess(taskSnapshot -> {
+                        Log.d("DEBUG", "attached image uploaded");
+                        Message message = new Message(MyApp.appInstance.getRepoInstance().getUserInstance().getId(),
+                                MyApp.appInstance.getRepoInstance().getUserInstance().getName(),
+                                text,
+                                finalImageName,
+                                finalFileName,
+                                Calendar.getInstance().getTime());
+                        FirebaseFirestore.getInstance().collection("channels").document(channelId)
+                                .collection("messages").add(message);
+                    })
+                    .subscribe();
+        }
+        else {
+            Message message = new Message(MyApp.appInstance.getRepoInstance().getUserInstance().getId(),
+                    MyApp.appInstance.getRepoInstance().getUserInstance().getName(),
+                    text,
+                    imageName,
+                    fileName,
+                    Calendar.getInstance().getTime());
+            FirebaseFirestore.getInstance().collection("channels").document(channelId)
+                    .collection("messages").add(message);
+        }
+        imageMessage = null;
+        fileMessage = null;
+    }
 
-        FirebaseFirestore.getInstance().collection("channels").document(channelId)
-                .collection("messages").add(message);
+    private void uploadAttachedFiles(String imageName,String fileName) {
+        if(fileMessage != null) {
+            //Uri file = Uri.fromFile(new File(fileMessage.toString()));
+            //Uri file = Uri.fromFile(new File(Uri.fromFile(fileMessage).toString()));
+            RxFirebaseStorage.putFile(storageRefFile.child(fileName), fileMessage)
+                    .subscribeOn(Schedulers.io())
+                    .doOnSuccess(taskSnapshot -> {
+                        Log.d("DEBUG", "attached file uploaded");
+                    })
+                    .subscribe();
+        }
+    }
+
+    public void getAttachedFiles(Intent data) {
+        fileMessage = (Uri) data.getExtras().getParcelable("docFile");
+        imageMessage = (Uri) data.getExtras().getParcelable("imageFile");
     }
 }

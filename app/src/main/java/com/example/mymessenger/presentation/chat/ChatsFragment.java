@@ -83,7 +83,7 @@ public class ChatsFragment extends Fragment implements EventListener<QuerySnapsh
     @Override
     public void onItemListClick(int adapterPosition) {
         Log.d(TAG, "ItemClick");
-        viewModel.startMessaging(this.getContext(), adapter.getChannelId(adapterPosition));
+        viewModel.startMessaging(this.getContext(), adapter.getChannel(adapterPosition));
     }
 
     @Override

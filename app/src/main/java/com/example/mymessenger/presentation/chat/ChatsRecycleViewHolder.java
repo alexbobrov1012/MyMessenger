@@ -33,9 +33,7 @@ public class ChatsRecycleViewHolder extends RecyclerView.ViewHolder implements V
     public void bind(Channel model) {
         chatNameTextView.setText(model.getName());
         chatImageView.setImageBitmap(MyApp.appInstance.getRepoInstance().getImage(model.getIcon()));
-       // String channelName = model.getName().get(0) + ", " + model.getName().get(1);
-       // chatNameTextView.setText(channelName);
-        //chatImageView.setImageBitmap();
+
     }
 
 

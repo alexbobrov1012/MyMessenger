@@ -15,4 +15,15 @@
     <string name="text_input_filed">Start typing..</string>
     <string name="MessagingLabel">chat</string>
     <string name="signOut">Sign out</string>
+    <string name="attach_file">Attach file</string>
+    <string name="detach_file">Detach file</string>
+    <string name="attach_image">Attach image</string>
+    <string name="detach_image">Detach image</string>
+    <string name="attach_activity_title">Attach files...</string>
+    <string name="attach_photo">Attach photo</string>
+    <string name="on_image_attached">Image was attached to message!</string>
+    <string name="on_photo_attached">Photo was attached to message!</string>
+    <string name="on_file_attached">File was attached to message!</string>
+    <string name="on_image_detached">Image was detached from message!</string>
+    <string name="on_file_detached">File was detached from message!</string>
 </resources>
