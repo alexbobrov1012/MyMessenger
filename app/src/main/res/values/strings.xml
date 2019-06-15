@@ -26,4 +26,13 @@
     <string name="on_file_attached">File was attached to message!</string>
     <string name="on_image_detached">Image was detached from message!</string>
     <string name="on_file_detached">File was detached from message!</string>
+    <string name="delete">Delete</string>
+    <string name="group_chat_creating_title">Creating group chat</string>
+    <string name="select_chat_icon">Select chat icon:</string>
+    <string name="select_icon">select icon</string>
+    <string name="submit">Submit</string>
+    <string name="pick_users_group">Pick participants:</string>
+    <string name="select_chat_icon_added">Select chat icon (already selected):</string>
+    <string name="leave_chat">Leave chat</string>
+    <string name="add_users_to_chat">Add users to chat</string>
 </resources>

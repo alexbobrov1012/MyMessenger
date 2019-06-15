@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
         Log.d(TAG, "onCreate");
         getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         setContentView(R.layout.activity_main);
-
+        Log.d("DEBUG", "main");
         getWindow().setExitTransition(new Fade());
         getWindow().setEnterTransition(new Fade());
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);

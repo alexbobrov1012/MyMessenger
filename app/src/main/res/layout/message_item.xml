@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="10dp"
+    android:layout_marginBottom="0dp">
+<FrameLayout
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,6 +22,26 @@
         android:layout_gravity="end"
         android:background="@drawable/shape_message_text_item"
         android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/authorMessageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:orientation="horizontal">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/authorImageMessage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:civ_border_color="#FF000000"
+                app:civ_border_width="1dp" />
+            <TextView
+                android:id="@+id/authorNameMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:textSize="20sp"
+                tools:text="Author" />
+        </LinearLayout>
         <ImageView
             android:id="@+id/imageView_message"
             android:layout_width="200dp"
@@ -48,11 +75,14 @@
                 android:id="@+id/fileName_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxHeight="30dp"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:paddingTop="4dp"
-                tools:text="filenaggggggggggme.zip"/>
+                android:maxLines="1"
+                tools:text="filenaggddddgggggme.zip"/>
             <ImageView
+                android:id="@+id/fileImageView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:maxWidth="50dp"
@@ -71,3 +101,10 @@
             tools:text="11/06/19 13:18" />
     </LinearLayout>
 </FrameLayout>
+    <View
+        android:id="@+id/selectionOverlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/selected_overlay"
+        android:visibility="invisible" />
+</androidx.cardview.widget.CardView>

@@ -1,12 +1,14 @@
 package com.example.mymessenger.presentation.chat;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.R;
 import com.example.mymessenger.presentation.OnItemListClickListener;
+import com.example.mymessenger.presentation.chat.groupchat.GroupChatCreaterActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -57,6 +60,14 @@ public class ChatsFragment extends Fragment implements EventListener<QuerySnapsh
         RecyclerView recyclerView = getView().findViewById(R.id.chatsRecycleView);
         adapter = new ChatsRecycleViewAdapter(this);
         recyclerView.setAdapter(adapter);
+        Button newGroupChannel = getActivity().findViewById(R.id.newChannelButton);
+        newGroupChannel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), GroupChatCreaterActivity.class);
+                startActivity(intent);
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         viewModel.getChannelsList().observe(this, new Observer<List<Channel>>() {
             @Override

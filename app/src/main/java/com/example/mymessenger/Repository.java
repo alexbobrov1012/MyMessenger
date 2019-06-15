@@ -10,42 +10,38 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.room.EmptyResultSetException;
 
 import com.example.mymessenger.database.AppRoomDatabase;
 import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.models.User;
 import com.example.mymessenger.models.collections.ChannelId;
-import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -116,14 +112,14 @@ public class Repository {
                     return Single.just(users);
                 })
                 .map(users -> {
-                    int idx = 0;
-                    for(int i = 0; i < users.size(); i++) {
-                        if(users.get(i).getId().equals(userInstance.getId())) {
-                            idx = i;
-                            break;
-                        }
-                    }
-                    users.remove(idx);
+//                    int idx = 0;
+//                    for(int i = 0; i < users.size(); i++) {
+//                        if(users.get(i).getId().equals(userInstance.getId())) {
+//                            idx = i;
+//                            break;
+//                        }
+//                    }
+//                    users.remove(idx);
                     return users;
                 })
                 .flatMap(users -> putUsersToDatabase(users));
@@ -139,6 +135,27 @@ public class Repository {
                     userInstance = user;
                     return Completable.complete();
                 });
+    }
+
+    public Single<List<User>> getUsersFromDatabase() {
+        return roomDatabase.userDao().getAllUsers()
+                .subscribeOn(Schedulers.io());
+
+    }
+
+    public void deleteUserFromDatabase() {
+        Executor executor = Executors.newSingleThreadExecutor();
+            executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                roomDatabase.userDao().deleteAll();
+            }
+        });
+    }
+
+    public Maybe<String> getUserIcon(String id) {
+        return roomDatabase.userDao().getUserIcon(id)
+                .subscribeOn(Schedulers.io());
     }
 
     private Single<List<User>> putUsersToDatabase(List<User> users) {

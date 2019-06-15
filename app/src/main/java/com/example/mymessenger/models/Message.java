@@ -17,6 +17,8 @@ public class Message {
     @NonNull
     private String id;
 
+    private String authorId;
+
     private String author;
 
     private String contentText;
@@ -31,14 +33,23 @@ public class Message {
     }
 
 
-    public Message(@NonNull String id, String author, String contentText, String contentImage,
+    public Message(@NonNull String id, String authorId, String author, String contentText, String contentImage,
                    String contentFile, Date date) {
         this.id = id;
+        this.authorId = authorId;
         this.author = author;
         this.contentText = contentText;
         this.contentImage = contentImage;
         this.contentFile = contentFile;
         this.date = date;
+    }
+    @NonNull
+    public String getAuthorId() {
+        return authorId;
+    }
+    @NonNull
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     @NonNull

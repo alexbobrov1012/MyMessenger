@@ -62,6 +62,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void initSignInFlow(Activity activity) {
+        Log.d("DEBUG", "initSignInFlow");
         MyApp.appInstance.getMainRepository().startSignInFlow(activity);
     }
 
@@ -70,13 +71,15 @@ public class MainViewModel extends ViewModel {
     }
 
     public void userSignInCheck(Activity activity) {
+        Log.d("DEBUG", "userSignInCheck");
         if (getAuthUserInstance() != null) {
             // Snackbar.make(findViewById(R.id.viewPager),"" + viewModel.getUserPic() + " " + viewModel.getUserId(), Snackbar.LENGTH_LONG).show();
             //Log.d(TAG, "Successfully signed in" + viewModel.getUserId());
             //fetchCurrentUser();
-
+            Log.d("DEBUG", "userSignInCheck -OK");
             Toast.makeText(activity,"You successfully signed in + "+ getAuthUserInstance().getUid(), Toast.LENGTH_SHORT).show();
         } else {
+            Log.d("DEBUG", "userSignInCheck - fail");
             initSignInFlow(activity);
             //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
         }

@@ -5,4 +5,6 @@
     <color name="colorAccent">#A72152</color>
     <color name="colorMyMessage">#65CC68</color>
     <color name="colorOtherMessage">#BFC950</color>
+    <color name="selected_overlay">#355F9DCE</color>
+
 </resources>

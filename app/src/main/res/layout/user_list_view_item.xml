@@ -49,5 +49,11 @@
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
             tools:text="User status" />
     </RelativeLayout>
+    <View
+        android:id="@+id/selectionView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/selected_overlay"
+        android:visibility="invisible" />
 
 </androidx.cardview.widget.CardView>

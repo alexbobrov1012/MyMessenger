@@ -57,24 +57,28 @@ public class MainRepository {
     }
 
     public void checkForSignInResult(int requestCode, int resultCode, @Nullable Intent data, Context context) {
+        Log.d("DEBUG", "checkForSignInResult");
         if (requestCode != RC_SIGN_IN) {
             return;
         }
         IdpResponse response = IdpResponse.fromResultIntent(data);
         // Successfully signed in
         if (resultCode == RESULT_OK) {
+            Log.d("DEBUG", "checkForSignInResult - OK");
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseUserMetadata metadata = user.getMetadata();
             if (metadata.getCreationTimestamp() == metadata.getLastSignInTimestamp()) {
                 //Snackbar.make(findViewById(R.id.button),"Greetings new user!!!", Snackbar.LENGTH_LONG).show();
-                Log.d(TAG, "add_db");
+                Log.d("DEBUG", "checkForSignInResult - addNewUser");
                 addNewUserToDB(new User(user.getUid(), user.getDisplayName(), user.getPhotoUrl()));
             } else {
+                Log.d("DEBUG", "checkForSignInResult - old user");
                 //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
             }
 
         } else {
             // Sign in failed
+            Log.d("DEBUG", "checkForSignInResult - FAILED");
             if (response == null) {
                 // User pressed back button
                 Toast.makeText(context, "sign_in_cancelled", Toast.LENGTH_SHORT).show();
@@ -88,21 +92,23 @@ public class MainRepository {
     }
 
     private void addNewUserToDB(final User user) {
-        Log.d(TAG, "addNewUserToDB userId = "+ user.getId());
+        Log.d("DEBUG", "checkForSignInResult - addNewUserToDB" + user.getId() +" " + user.getName());
         dataBase.collection("users").document(user.getId()).set(user).addOnSuccessListener(
                 new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "User added to db");
+                        Log.d("DEBUG", "User added to db");
                     }})
                     .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error updating document", e);
+                        Log.d("DEBUG", "Error updating document", e);
                     }});
         if(user.getPic_url() != null) {
+            Log.d("DEBUG", "downloadUserPhoto" +" "+ user.getPic_url());
             Executor executor =  Executors.newSingleThreadExecutor();
             executor.execute(new Runnable() {
+
                 @Override
                 public void run() {
                     ImageManager.downloadUserPhoto(user.getPic_url());

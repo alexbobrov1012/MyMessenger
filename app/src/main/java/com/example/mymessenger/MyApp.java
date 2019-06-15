@@ -34,7 +34,7 @@ public class MyApp extends Application {
         super.onCreate();
         appInstance = this;
         roomDatabase = Room.databaseBuilder(this,
-                AppRoomDatabase.class, "MessengerDB1")
+                AppRoomDatabase.class, "MessengerDB2")
                 .build();
         repoInstance = new Repository();
         mainRepository = new MainRepository();

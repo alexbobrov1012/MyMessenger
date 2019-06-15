@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Single;
@@ -46,6 +47,19 @@ public class MessagingManager {
                 });
     }
 
+    public static Single<Channel> initGroupChannel(String channelName,
+                                                   String channelIconName,
+                                                   List<String> userIds) {
+        String channelId = UUID.randomUUID().toString();
+        Channel newChannel = new Channel(channelId, channelName, channelIconName);
+        return RxFirestore.setDocument(FirebaseFirestore.getInstance()
+        .collection("channels").document(channelId), newChannel)
+                .andThen(Single.just(newChannel)
+                .doOnSuccess(channel -> {
+                    Log.d("DEBUG", "GROUP CHANNEL CREATED id = " + channel.getId());
+                    addChannelToUsers(userIds, channelId);
+                }));
+    }
     private static void addChannelToUsers(List<String> usersIds, String channelId) {
         Map<String, String> channelDoc = new HashMap<String, String>() {{
             put("id", channelId);
