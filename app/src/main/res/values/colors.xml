@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimary">#F75377B8</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#A72152</color>
-    <color name="colorMyMessage">#65CC68</color>
-    <color name="colorOtherMessage">#BFC950</color>
+    <color name="colorMyMessage">#B665CC68</color>
+    <color name="colorOtherMessage">#AEBFC950</color>
     <color name="selected_overlay">#355F9DCE</color>
-
+    <color name="colorRecycleView">#CD4F9EEC</color>
+    <color name="colorRecycleViewHover">#CD82A5CC</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="usersColor">#98AFBFD3</color>
 </resources>

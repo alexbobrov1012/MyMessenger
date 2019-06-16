@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -41,6 +42,8 @@ public class ChatsFragment extends Fragment implements EventListener<QuerySnapsh
     private ChatsRecycleViewAdapter adapter;
 
     private ListenerRegistration registration;
+
+    SearchView searchView;
 
     public static ChatsFragment newInstance() {
         return new ChatsFragment();
@@ -73,6 +76,19 @@ public class ChatsFragment extends Fragment implements EventListener<QuerySnapsh
             @Override
             public void onChanged(List<Channel> channels) {
                 adapter.setChats(channels);
+            }
+        });
+        searchView = getView().findViewById(R.id.searchChannelsView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                viewModel.search(newText);
+                return false;
             }
         });
     }

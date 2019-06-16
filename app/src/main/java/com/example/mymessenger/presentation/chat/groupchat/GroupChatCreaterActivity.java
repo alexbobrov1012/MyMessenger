@@ -124,10 +124,9 @@ public class GroupChatCreaterActivity extends AppCompatActivity implements Selec
             }
         };
 
-        Toolbar toolbar = findViewById(R.id.toolbarGroup);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
+        getSupportActionBar().setTitle(getResources().getString(R.string.group_chat_creating_title));
 
     }
 

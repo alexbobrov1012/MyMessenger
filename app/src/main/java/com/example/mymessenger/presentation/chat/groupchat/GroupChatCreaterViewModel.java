@@ -28,12 +28,11 @@ public class GroupChatCreaterViewModel extends ViewModel {
     private MutableLiveData<List<User>> allUsersList = new MutableLiveData<>();
 
     public void fetchUsers() {
-        //TODO: get users from db
-        MyApp.appInstance.getRepoInstance().getUsersFromDatabase()
+        MyApp.appInstance.getRepoInstance().getUsersFromDatabaseButMe()
                 .subscribe(users -> {
                     allUsersList.postValue(users);
                 });
-        //MyApp.appInstance.getRepoInstance().deleteUserFromDatabase();
+
     }
 
     public MutableLiveData<List<User>> getAllUsersList() {

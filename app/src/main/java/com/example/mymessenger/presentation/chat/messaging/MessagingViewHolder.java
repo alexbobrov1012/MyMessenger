@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -31,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import durdinapps.rxfirebase2.RxFirebaseStorage;
 import io.reactivex.CompletableSource;
@@ -87,7 +89,6 @@ View.OnLongClickListener{
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
         this.textTextView = itemView.findViewById(R.id.text_message);
-
         this.authorNameTextView = itemView.findViewById(R.id.authorNameMessage);
         this.dateTextView = itemView.findViewById(R.id.date_message);
         this.fileNameTextView = itemView.findViewById(R.id.fileName_message);

@@ -29,6 +29,9 @@ import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.presentation.ActionModeCallback;
 import com.example.mymessenger.presentation.OnItemListClickListener;
 import com.example.mymessenger.presentation.OnMessageClick;
+import com.example.mymessenger.presentation.chat.groupchat.addusers.AddUserViewModel;
+import com.example.mymessenger.presentation.chat.groupchat.addusers.AddUsersActivity;
+import com.example.mymessenger.presentation.chat.groupchat.showusers.ShowUsersActivity;
 import com.example.mymessenger.presentation.utils.AttachActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -61,6 +64,8 @@ public class MessagingActivity extends AppCompatActivity implements EventListene
 
     private ActionModeCallback actionModeCallback;
 
+    private Channel channel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +94,7 @@ public class MessagingActivity extends AppCompatActivity implements EventListene
                 actionMode = null;
             }
         };
-        Channel channel = (Channel) getIntent().getSerializableExtra("channel");
+        channel = (Channel) getIntent().getSerializableExtra("channel");
         isPrivate = channel.isPrivate();
         RecyclerView recyclerView = findViewById(R.id.recycler_view_messages);
         adapter = new MessagingAdapter(this, this, channel.isPrivate());
@@ -122,6 +127,13 @@ public class MessagingActivity extends AppCompatActivity implements EventListene
                 }
             }
         });
+        MyApp.appInstance.getRepoInstance().isUserInChat("TL9CQKKNySQGBgknwbgNfFPRL4o2",
+                "ySIgzs8DBAUz69dcmIJKlXQT5TI3TL9CQKKNySQGBgknwbgNfFPRL")
+                .subscribe(s -> {
+                    Log.d("DEBUG", s + " KEKA");
+                });
+
+
 
         CircleImageView imageView = findViewById(R.id.chatTitleImageView);
         imageView.setImageBitmap(MyApp.appInstance.getRepoInstance().getImage(channel.getIcon()));
@@ -142,7 +154,11 @@ public class MessagingActivity extends AppCompatActivity implements EventListene
         ImageView send = findViewById(R.id.imageView_send);
         send.setOnClickListener(this);
         textMessageEditText = findViewById(R.id.editText_message);
-
+        if(getIntent().getStringExtra("messageToShare") != null) {
+            textMessageEditText.setText(getIntent().getStringExtra("messageToShare"));
+            getIntent().removeExtra("message");
+            Log.d("DEBUG", "SHARE NEWS OK");
+        }
         FloatingActionButton fabAttach = findViewById(R.id.fab_attach);
         fabAttach.setOnClickListener(this);
 
@@ -168,12 +184,21 @@ public class MessagingActivity extends AppCompatActivity implements EventListene
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_users_to_chat) {
             Log.d("DEBUG", "ADD USERS TO CHAT");
-
+            Intent intent = new Intent(this, AddUsersActivity.class);
+            intent.putExtra("chatId", channel.getId());
+            startActivity(intent);
         }
         if (id == R.id.action_leave_chat) {
             Log.d("DEBUG", "LEAVE CHAT");
             viewModel.leaveChat();
             finish();
+        }
+        if (id == R.id.action_show_users) {
+            Log.d("DEBUG", "SHOW CHANNEL USERS");
+            Intent intent = new Intent(this, ShowUsersActivity.class);
+            intent.putExtra("chatId", channel.getId());
+            intent.putExtra("chatName", channel.getName());
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

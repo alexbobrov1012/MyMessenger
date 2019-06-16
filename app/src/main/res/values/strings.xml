@@ -35,4 +35,25 @@
     <string name="select_chat_icon_added">Select chat icon (already selected):</string>
     <string name="leave_chat">Leave chat</string>
     <string name="add_users_to_chat">Add users to chat</string>
+    <string name="title_activity_channel">ChannelActivity</string>
+    <string name="channel_name_hint">Name of channel</string>
+    <string name="channel_link_hint">Link</string>
+    <string name="add">Add</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="dialog_add_title">New channel:</string>
+    <string name="error_dialog_link_valid">Not valid link</string>
+    <string name="error_dialog_empty">Enter channel name and link</string>
+    <string name="error_dialog_link_unsup">Unsupported link</string>
+    <string name="title_activity_web">WebActivity</string>
+    <string name="error_no_internet">Internet connection lost</string>
+    <string name="dialog_edit_title">Edit channel:</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_period">News refresh time:</string>
+    <string name="settings_lang">Language:</string>
+    <string name="share_news">Share news</string>
+    <string name="share_activity_title">Choose a channel to share</string>
+    <string name="choose_users">Choose users:</string>
+    <string name="show_users_in_chat">Show users in chat</string>
+    <string name="show_users_in_chat_title">Users of</string>
 </resources>

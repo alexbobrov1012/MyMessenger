@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.mymessenger.MyApp;
 import com.example.mymessenger.R;
 import com.example.mymessenger.presentation.profile.edit.EditProfileActivity;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ProfileFragment extends Fragment {
@@ -79,6 +80,10 @@ public class ProfileFragment extends Fragment {
                 startActivityForResult(editActivity, RC_EDITED);
             }
         });
+        CollapsingToolbarLayout collapsingToolbarLayout = getView().findViewById(R.id.collapsingToolbarProfile);
+        //collapsingToolbarLayout.setTitle(getTitle());
+        collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+        collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
         toolbar = getView().findViewById(R.id.profile_name);
         imageView = getView().findViewById(R.id.profile_pic);
         status = getView().findViewById(R.id.status_textView);

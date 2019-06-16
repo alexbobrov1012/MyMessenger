@@ -62,6 +62,7 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
+            android:autoLink="web"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
             tools:text="This is an example of text in message!!!!!" />
         <LinearLayout

@@ -9,12 +9,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchChannelsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+        </androidx.appcompat.widget.SearchView>
         <Button
             android:id="@+id/newChannelButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="new channel" />
+            android:background="@drawable/buttons_shape_selector"
+            android:textColor="@color/white"
+            android:text="new channel"
+            android:layout_marginBottom="5dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatsRecycleView"

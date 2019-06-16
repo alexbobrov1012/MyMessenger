@@ -20,24 +20,14 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.mymessenger.MyApp;
 import com.example.mymessenger.R;
-import com.example.mymessenger.models.User;
+import com.example.mymessenger.news.channels.ChannelFragment;
 import com.example.mymessenger.presentation.chat.ChatsFragment;
 import com.example.mymessenger.presentation.profile.ProfileFragment;
 import com.example.mymessenger.presentation.user.UsersFragment;
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Date;
-
-import durdinapps.rxfirebase2.RxFirestore;
 
 public class MainActivity extends AppCompatActivity implements OnCompleteListener{
 
@@ -67,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
         progressBar = findViewById(R.id.loadingProgressBarMain);
         progressBar.setVisibility(View.VISIBLE);
         //MyApp.appInstance.showLoading(this);
+        //MyApp.appInstance.getRepoInstance().deleteUserFromDatabase();
         viewModel.auth.observe(this, firebaseUser -> {
             if(firebaseUser != null) {
                 viewModel.fetchCurrentUser();
@@ -85,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnCompleteListene
                     viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
                     viewPagerAdapter.addFragment(new UsersFragment(), "Users");
                     viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
+                    viewPagerAdapter.addFragment(new ChannelFragment(), "News");
                     viewPager.setAdapter(viewPagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
                 }

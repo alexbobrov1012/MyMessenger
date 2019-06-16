@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -35,6 +36,8 @@ public class UsersFragment extends Fragment implements OnItemListClickListener {
 
     private UsersRecycleViewAdapter adapter;
 
+    SearchView searchView;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -55,6 +58,19 @@ public class UsersFragment extends Fragment implements OnItemListClickListener {
             @Override
             public void onChanged(List<User> users) {
                 adapter.setUsers(users);
+            }
+        });
+        searchView = getView().findViewById(R.id.usersSearchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                viewModel.search(newText);
+                return false;
             }
         });
     }

@@ -11,9 +11,11 @@ import com.example.mymessenger.models.Channel;
 import com.example.mymessenger.R;
 import com.example.mymessenger.presentation.OnItemListClickListener;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ChatsRecycleViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    ImageView chatImageView;
+    CircleImageView chatImageView;
 
     TextView chatNameTextView;
 

@@ -73,5 +73,12 @@ public class ChatsViewModel extends ViewModel {
         intent.setFlags(FLAG_ACTIVITY_SINGLE_TOP);
         context.startActivity(intent);
     }
+
+    public void search(String newText) {
+        MyApp.appInstance.getRepoInstance().getSearchResultChannels(newText + "%")
+                .subscribe(result -> {
+                    channelsList.postValue(result);
+                });
+    }
 }
 

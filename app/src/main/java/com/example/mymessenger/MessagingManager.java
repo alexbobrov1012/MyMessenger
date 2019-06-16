@@ -60,7 +60,7 @@ public class MessagingManager {
                     addChannelToUsers(userIds, channelId);
                 }));
     }
-    private static void addChannelToUsers(List<String> usersIds, String channelId) {
+    public static void addChannelToUsers(List<String> usersIds, String channelId) {
         Map<String, String> channelDoc = new HashMap<String, String>() {{
             put("id", channelId);
         }};

@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUserMetadata;
+import com.google.firebase.events.Subscriber;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -44,6 +45,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_OK;
@@ -87,10 +89,28 @@ public class Repository {
                                 if(tmpChannel.isPrivate()) {
                                     tmpChannel = parseChannel(tmpChannel);
                                 }
-                                return Single.just(tmpChannel);
+                                return putChannelToDB(tmpChannel);
                             });
                 });
     }
+
+    private Single<Channel> putChannelToDB(Channel channel) {
+        return roomDatabase.channelDao().insert(channel)
+                .subscribeOn(Schedulers.io())
+                .andThen(Single.just(channel));
+    }
+
+    public void deleteAllChannelsFromDB() {
+        Executor executor =  Executors.newSingleThreadExecutor();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                roomDatabase.channelDao().deleteAll();
+            }
+        });
+
+    }
+
 
     private Channel parseChannel(Channel tmpChannel) {
         int index = 0;
@@ -122,7 +142,12 @@ public class Repository {
 //                    users.remove(idx);
                     return users;
                 })
-                .flatMap(users -> putUsersToDatabase(users));
+                .flatMap(users -> {
+                    return putUsersToDatabase(users);
+                })
+                .flatMap(users -> {
+                    return getUsersFromDatabaseButMe();
+                });
     }
 
     public Completable fetchCurrentUser(String id) {
@@ -143,6 +168,29 @@ public class Repository {
 
     }
 
+    public Single<List<User>> getUsersFromDatabaseButMe() {
+        return roomDatabase.userDao().getAllUsersButMe(userInstance.getId())
+                .subscribeOn(Schedulers.io());
+
+    }
+
+    public Single<List<Channel>> getChannelsFromDatabase() {
+        return roomDatabase.channelDao().getAllChannels()
+                .subscribeOn(Schedulers.io());
+    }
+
+//    public Single<List<User>> getUsersToAddToChat() {
+//        FirebaseFirestore.getInstance().collection("users")
+//    }
+
+    public Single<Boolean> isUserInChat(String userId, String chatId) {
+        Query query = FirebaseFirestore.getInstance().collection("users")
+                .document(userId).collection("channelsList").whereEqualTo("id", chatId);
+
+        return RxFirestore.getCollection(query)
+                .isEmpty();
+    }
+
     public void deleteUserFromDatabase() {
         Executor executor = Executors.newSingleThreadExecutor();
             executor.execute(new Runnable() {
@@ -153,10 +201,6 @@ public class Repository {
         });
     }
 
-    public Maybe<String> getUserIcon(String id) {
-        return roomDatabase.userDao().getUserIcon(id)
-                .subscribeOn(Schedulers.io());
-    }
 
     private Single<List<User>> putUsersToDatabase(List<User> users) {
         return roomDatabase.userDao().insert(users)
@@ -326,6 +370,22 @@ public class Repository {
             ImageManager.uploadImage(newImageFile);
         }
         return new BitmapDrawable(imageBitmap);
+    }
+
+    public Single<List<User>> getSearchResult(String input) {
+        return roomDatabase.userDao().searchUser(input, userInstance.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<List<Channel>> getSearchResultChannels(String input) {
+        return roomDatabase.channelDao().searchChannel(input)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public void addUsersToChannel(List<String> userIds, String chatId) {
+        MessagingManager.addChannelToUsers(userIds, chatId);
     }
 }
 

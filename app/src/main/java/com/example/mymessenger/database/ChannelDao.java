@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.example.mymessenger.models.Channel;
+import com.example.mymessenger.models.User;
 
 import java.util.List;
 
@@ -21,7 +22,10 @@ public interface ChannelDao {
     Completable insert(List<Channel> channelList);
 
     @Query("select * from channels_table")
-    Single<List<Channel>> getAllEvents();
+    Single<List<Channel>> getAllChannels();
+
+    @Query("SELECT * FROM channels_table WHERE name LIKE :input")
+    Single<List<Channel>> searchChannel(String input);
 
     @Query("delete from channels_table")
     void deleteAll();

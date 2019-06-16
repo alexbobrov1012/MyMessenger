@@ -80,6 +80,7 @@ public class MainViewModel extends ViewModel {
             Toast.makeText(activity,"You successfully signed in + "+ getAuthUserInstance().getUid(), Toast.LENGTH_SHORT).show();
         } else {
             Log.d("DEBUG", "userSignInCheck - fail");
+            MyApp.appInstance.getRepoInstance().deleteAllChannelsFromDB();
             initSignInFlow(activity);
             //Snackbar.make(findViewById(R.id.button),"Welcome back, " + userAuth.getCurrentUser().getDisplayName() + "!!!", Snackbar.LENGTH_LONG).show();
         }

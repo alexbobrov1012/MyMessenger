@@ -3,13 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.mymessenger.presentation.main.MainActivity">
     <item
-        android:id="@+id/action_leave_chat"
+        android:id="@+id/action_show_users"
         android:orderInCategory="100"
-        android:title="@string/leave_chat"
+        android:title="@string/show_users_in_chat"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_add_users_to_chat"
         android:orderInCategory="100"
         android:title="@string/add_users_to_chat"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_leave_chat"
+        android:orderInCategory="100"
+        android:title="@string/leave_chat"
         app:showAsAction="never" />
 </menu>

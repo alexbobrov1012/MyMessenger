@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.example.mymessenger.MessagingManager;
 import com.example.mymessenger.R;
 import com.example.mymessenger.Utils;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,11 @@ public class UsersProfile extends AppCompatActivity implements View.OnClickListe
 
         viewModel = ViewModelProviders.of(this).get(UsersProfileViewModel.class);
         viewModel.getUserData(getIntent().getExtras());
+
+        CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsingToolbarUser);
+        //collapsingToolbarLayout.setTitle(getTitle());
+        collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+        collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
 
         profilePicImageView.setImageBitmap(viewModel.getProfilePicture());
         toolbar.setTitle(viewModel.getUserName());

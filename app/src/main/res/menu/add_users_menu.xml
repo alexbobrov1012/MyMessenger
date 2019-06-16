@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.mymessenger.presentation.main.MainActivity">
+    <item
+        android:id="@+id/submit_selection"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_check_box_black_24dp"
+        android:title="@string/choose_users"
+        app:showAsAction="always" />
+</menu>

@@ -5,23 +5,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/AppToolbarGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbarGroup"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:title="@string/group_chat_creating_title"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
-            </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,26 +12,34 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter name:"/>
+            android:text="Enter name:"
+            android:textSize="16sp"/>
         <EditText
             android:id="@+id/nameInputGroup"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:maxLines="1"/>
         <TextView
             android:id="@+id/iconNameGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/select_chat_icon"/>
+            android:text="@string/select_chat_icon"
+            android:textSize="16sp"/>
         <Button
             android:id="@+id/selectIconButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/select_icon"/>
+            android:text="@string/select_icon"
+            android:background="@drawable/buttons_shape_selector"
+            android:textColor="@color/white"
+            android:layout_marginBottom="5dp"
+            />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/pick_users_group"
-            android:layout_marginBottom="5dp"/>
+            android:layout_marginBottom="5dp"
+            android:textSize="16sp"/>
     </LinearLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/group_recyclerView"

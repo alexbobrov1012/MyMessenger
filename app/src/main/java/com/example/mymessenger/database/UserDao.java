@@ -26,8 +26,14 @@ public interface UserDao {
     @Query("select * from users_table")
     Single<List<User>> getAllUsers();
 
-    @Query("SELECT pic_url FROM users_table WHERE id in (:uId)")
-    Maybe<String> getUserIcon(String uId);
+    @Query("select * from users_table WHERE id != :myId")
+    Single<List<User>> getAllUsersButMe(String myId);
+
+    @Query("SELECT * FROM users_table WHERE id == :uId")
+    Single<User> getUser(String uId);
+
+    @Query("SELECT * FROM users_table WHERE name LIKE :input AND id != :myId")
+    Single<List<User>> searchUser(String input, String myId);
 
     @Query("delete from users_table")
     void deleteAll();

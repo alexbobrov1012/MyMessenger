@@ -61,5 +61,9 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'com.github.FrangSierra:RxFirebase:1.5.6'
+
+    // WorkManager
+    def versions_work = "2.0.1"
+    implementation "androidx.work:work-runtime:$versions_work"
 }
 apply plugin: 'com.google.gms.google-services'

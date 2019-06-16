@@ -1,5 +1,7 @@
 package com.example.mymessenger.presentation.user;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -33,4 +35,10 @@ public class UsersViewModel extends ViewModel {
                 });
     }
 
+    public void search(String newText) {
+        MyApp.appInstance.getRepoInstance().getSearchResult(newText + "%")
+                .subscribe(result -> {
+                    allUsers.postValue(result);
+                });
+    }
 }
